@@ -1,4 +1,4 @@
 # MoviesApp
 Udacity Project Movies App
 
-Please don't forget to insert API Key in res/values/strings.xml on line 5!
+Please don't forget to insert API Key in NetworkUtils on line 16!

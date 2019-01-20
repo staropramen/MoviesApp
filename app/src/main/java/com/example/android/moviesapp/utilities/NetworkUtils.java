@@ -11,6 +11,11 @@ public class NetworkUtils {
     private static final String MOVIE_DATABASE_URL_POPULAR =
             "http://api.themoviedb.org/3/movie/popular";
 
+    //API Key
+    private static final String API_KEY =
+            "673ca6ed38cbb77de6d3a17df821abd5";
+
+    // TODO Delete Debug Function
     public static void check(){
         Log.v(TAG, MOVIE_DATABASE_URL_POPULAR);
     }

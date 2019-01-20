@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">MoviesApp</string>
 
-    //API Key for Movie Database
+    <!-- API Key for Movie Database -->
     <string name="api_key">673ca6ed38cbb77de6d3a17df821abd5</string>
+
+    <!-- Urls for the app -->
+    <string name="popular_url">http://api.themoviedb.org/3/movie/popular</string>
 </resources>
