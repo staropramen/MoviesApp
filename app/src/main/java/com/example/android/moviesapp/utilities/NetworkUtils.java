@@ -3,8 +3,12 @@ package com.example.android.moviesapp.utilities;
 import android.net.Uri;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Scanner;
 
 public class NetworkUtils {
 
@@ -37,6 +41,28 @@ public class NetworkUtils {
 
         Log.v(TAG, "Built Url " + url);
         return url;
+    }
+
+    //Return response from Http request
+    public static String getHttpresponse(URL url) throws IOException{
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+        try {
+            InputStream inputStream = httpURLConnection.getInputStream();
+
+            Scanner scanner = new Scanner(inputStream);
+
+            boolean hasInput = scanner.hasNext();
+
+            if(hasInput){
+                Log.v(TAG, "Sream " + scanner.next());
+                return scanner.next();
+            }else {
+                return null;
+            }
+        }finally {
+            httpURLConnection.disconnect();
+        }
     }
 
 
