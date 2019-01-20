@@ -51,11 +51,16 @@ public class NetworkUtils {
             InputStream inputStream = httpURLConnection.getInputStream();
 
             Scanner scanner = new Scanner(inputStream);
+            scanner.useDelimiter("\\A");
 
             boolean hasInput = scanner.hasNext();
 
             if(hasInput){
-                return scanner.next();
+                String jsonResult ="";
+                while (scanner.hasNext()){
+                    jsonResult = jsonResult + scanner.next();
+                }
+                return jsonResult;
             }else {
                 return null;
             }
