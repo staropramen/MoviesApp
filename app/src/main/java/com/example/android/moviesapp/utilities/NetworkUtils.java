@@ -1,6 +1,10 @@
 package com.example.android.moviesapp.utilities;
 
+import android.net.Uri;
 import android.util.Log;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class NetworkUtils {
 
@@ -15,8 +19,25 @@ public class NetworkUtils {
     private static final String API_KEY =
             "673ca6ed38cbb77de6d3a17df821abd5";
 
-    // TODO Delete Debug Function
-    public static void check(){
-        Log.v(TAG, MOVIE_DATABASE_URL_POPULAR);
+    //Query Parameters
+    final static String KEY_PARAM = "api_key";
+
+    //Build Url to query
+    public static URL builtUrl(){
+        Uri builtUri = Uri.parse(MOVIE_DATABASE_URL_POPULAR).buildUpon()
+                .appendQueryParameter(KEY_PARAM, API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built Url " + url);
+        return url;
     }
+
+
 }
