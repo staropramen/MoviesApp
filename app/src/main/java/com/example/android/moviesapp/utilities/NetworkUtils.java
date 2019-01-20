@@ -17,7 +17,7 @@ public class NetworkUtils {
 
     //Base URL for API request
     private static final String MOVIE_DATABASE_URL_POPULAR =
-            "http://api.themoviedb.org/3/movie/popular";
+            "http://api.themoviedb.org/3/movie";
 
     //API Key
     private static final String API_KEY =
@@ -27,8 +27,9 @@ public class NetworkUtils {
     final static String KEY_PARAM = "api_key";
 
     //Build Url to query
-    public static URL builtUrl(){
+    public static URL builtUrl(String preferencQuery){
         Uri builtUri = Uri.parse(MOVIE_DATABASE_URL_POPULAR).buildUpon()
+                .appendPath(preferencQuery)
                 .appendQueryParameter(KEY_PARAM, API_KEY)
                 .build();
 
@@ -39,12 +40,11 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
-        Log.v(TAG, "Built Url " + url);
         return url;
     }
 
     //Return response from Http request
-    public static String getHttpresponse(URL url) throws IOException{
+    public static String getHttpResponse(URL url) throws IOException{
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
         try {
@@ -55,7 +55,6 @@ public class NetworkUtils {
             boolean hasInput = scanner.hasNext();
 
             if(hasInput){
-                Log.v(TAG, "Sream " + scanner.next());
                 return scanner.next();
             }else {
                 return null;
