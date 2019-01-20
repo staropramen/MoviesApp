@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 String jsonResponse = NetworkUtils.getHttpResponse(moviesRequestUrl);
-                Log.v("JSON", jsonResponse);
                 return jsonResponse;
             }catch (IOException e){
                 e.printStackTrace();
