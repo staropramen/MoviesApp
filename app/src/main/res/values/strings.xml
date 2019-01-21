@@ -6,12 +6,12 @@
 
     <!-- Urls for the app -->
     <string name="popular_url">http://api.themoviedb.org/3/movie</string>
-    
+
     <!-- Menu strings-->
     <string name="sort_order">Sort Order</string>
     <string name="sort_popular">Most Popular</string>
     <string name="sort_top_rated">Top Rated</string>
     <string name="popular">popular</string>
     <string name="top_rated">top_rated</string>
-    
+
 </resources>

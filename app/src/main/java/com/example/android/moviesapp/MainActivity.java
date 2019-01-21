@@ -1,5 +1,7 @@
 package com.example.android.moviesapp;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
@@ -22,7 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieOnClickHandler {
 
     private String TAG = MainActivity.class.getSimpleName();
     private MovieAdapter movieAdapter;
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(gridLayoutManager);
 
         //Set Adapter
-        movieAdapter = new MovieAdapter();
+        movieAdapter = new MovieAdapter(this);
 
         mRecyclerView.setAdapter(movieAdapter);
 
@@ -55,6 +57,15 @@ public class MainActivity extends AppCompatActivity {
     //Method to kick off the Background task
     private void loadMovieData(String sortOrder){
         new FetchMovieTask().execute(sortOrder);
+    }
+
+    @Override
+    public void onClick(Movie movie) {
+        Context context = this;
+        Class destinationClass = DetailsActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        intentToStartDetailActivity.putExtra("movie", movie);
+        startActivity(intentToStartDetailActivity);
     }
 
     //Asynch Task to Load Data from API

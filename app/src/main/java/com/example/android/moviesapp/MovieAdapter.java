@@ -3,6 +3,7 @@ package com.example.android.moviesapp;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +22,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private ArrayList<Movie> moviesArray;
     private String baseImageUrl = "https://image.tmdb.org/t/p/w185";
 
-    //Constructor
-    public MovieAdapter(){
+    private final MovieOnClickHandler movieOnClickHandler;
 
+    public interface MovieOnClickHandler {
+        void onClick(Movie movie);
+    }
+
+    //Constructor
+    public MovieAdapter(MovieOnClickHandler clickHandler){
+        movieOnClickHandler = clickHandler;
     }
 
     //View Holder
-    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder{
+    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         //Initialize Image View
         public final ImageView movieImageView;
 
@@ -35,6 +42,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             super(view);
             //Get a reference to the Image View
             movieImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            Movie movie = moviesArray.get(adapterPosition);
+            movieOnClickHandler.onClick(movie);
         }
     }
 
