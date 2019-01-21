@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.moviesapp.model.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.zip.Inflater;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
     //Global Variables
-    private ArrayList<String[]> moviesArray;
+    private ArrayList<Movie> moviesArray;
     private String baseImageUrl = "https://image.tmdb.org/t/p/w185";
 
     //Constructor
@@ -52,8 +53,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(@NonNull MovieAdapterViewHolder movieAdapterViewHolder, int position) {
-        String[] movieStringArray = moviesArray.get(position);
-        String moviePath = movieStringArray[2];
+        Movie movieObject = moviesArray.get(position);
+        String moviePath = movieObject.getPosterPath();
         Picasso.get().load(baseImageUrl + moviePath).into(movieAdapterViewHolder.movieImageView);
     }
 
@@ -64,7 +65,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     //Function to set moviesArray
-    public void setMoviesArray(ArrayList<String[]> moviesArrayToSet){
+    public void setMoviesArray(ArrayList<Movie> moviesArrayToSet){
         moviesArray = moviesArrayToSet;
         notifyDataSetChanged();
     }

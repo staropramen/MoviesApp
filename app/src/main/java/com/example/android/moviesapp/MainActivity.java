@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.utilities.NetworkUtils;
 import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 import com.squareup.picasso.Picasso;
@@ -57,10 +58,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Asynch Task to Load Data from API
-    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<String[]>>{
+    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>>{
 
         @Override
-        protected ArrayList<String[]> doInBackground(String... params) {
+        protected ArrayList<Movie> doInBackground(String... params) {
             //Return null if param is empty
             if(params.length == 0){
                 return null;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Log.v(TAG, "Im in try in do in Background");
                 String jsonResponse = NetworkUtils.getHttpResponse(moviesRequestUrl);
-                ArrayList<String[]> movieJsonData = OpenMovieJsonUtils.getStringsFromJson(MainActivity.this, jsonResponse);
+                ArrayList<Movie> movieJsonData = OpenMovieJsonUtils.getStringsFromJson(MainActivity.this, jsonResponse);
                 return movieJsonData;
             }catch (Exception e){
                 e.printStackTrace();
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<String[]> moviesData) {
+        protected void onPostExecute(ArrayList<Movie> moviesData) {
             if(moviesData != null){
                 Log.v(TAG, "Im in PostExecute if statement");
                 movieAdapter.setMoviesArray(moviesData);
