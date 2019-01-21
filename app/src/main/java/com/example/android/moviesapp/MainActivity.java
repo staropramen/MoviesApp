@@ -1,11 +1,16 @@
 package com.example.android.moviesapp;
 
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.android.moviesapp.utilities.NetworkUtils;
@@ -21,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     private MovieAdapter movieAdapter;
     private RecyclerView mRecyclerView;
+    private String sortOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +46,14 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView.setAdapter(movieAdapter);
 
-        //Load the movie data
-        loadMovieData();
+        //Load the movie data, default sorted by popularity
+        sortOrder = getString(R.string.popular);
+        loadMovieData(sortOrder);
     }
 
     //Method to kick off the Background task
-    private void loadMovieData(){
-        //Todo delete later
-        String myPreference = "popular";
-
-        // TODO Debug Function Delete later
-        new FetchMovieTask().execute(myPreference);
+    private void loadMovieData(String sortOrder){
+        new FetchMovieTask().execute(sortOrder);
     }
 
     //Asynch Task to Load Data from API
@@ -84,5 +87,41 @@ public class MainActivity extends AppCompatActivity {
                 movieAdapter.setMoviesArray(moviesData);
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.sort_popular:
+                if(item.isChecked()){
+                    return false;
+                }else {
+                    item.setChecked(true);
+                    sortOrder = getString(R.string.popular);
+                    loadMovieData(sortOrder);
+                    return true;
+                }
+            case R.id.sort_top_rated:
+                if(item.isChecked()){
+                    return false;
+                }else {
+                    item.setChecked(true);
+                    sortOrder = getString(R.string.top_rated);
+                    loadMovieData(sortOrder);
+                    return true;
+                }
+                default:
+                    return super.onOptionsItemSelected(item);
+        }
+
+
     }
 }

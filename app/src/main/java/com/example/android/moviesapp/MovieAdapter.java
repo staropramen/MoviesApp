@@ -68,5 +68,4 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         moviesArray = moviesArrayToSet;
         notifyDataSetChanged();
     }
-
 }
