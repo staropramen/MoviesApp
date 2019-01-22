@@ -2,6 +2,7 @@ package com.example.android.moviesapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private ConnectivityManager connectivityManager;
 
+    private String PREF_FILENAME = "SortOrderFile";
+    private String PREF_VAL_KEY = "PreferredSortOrder";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setAdapter(movieAdapter);
 
         //Load the movie data, default sorted by popularity
-        sortOrder = getString(R.string.popular);
+        sortOrder = getSharedPreferenceOrder();
         loadMovieData(sortOrder);
     }
 
@@ -101,6 +105,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         errorTextView.setVisibility(View.VISIBLE);
         //Default set text to error
         errorTextView.setText(R.string.error_message);
+    }
+
+    private String getSharedPreferenceOrder() {
+        SharedPreferences sharedPrefs = getSharedPreferences(PREF_FILENAME, 0);
+        String order = sharedPrefs.getString(PREF_VAL_KEY, getString(R.string.popular));
+        return order;
+    }
+
+    private void saveSharedPreferenceOrder(String order){
+        SharedPreferences sharedPrefs = getSharedPreferences(PREF_FILENAME, 0);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(PREF_VAL_KEY, order);
+        editor.commit();
     }
 
     //Asynch Task to Load Data from API
@@ -159,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     return false;
                 }else {
                     item.setChecked(true);
+                    saveSharedPreferenceOrder(getString(R.string.popular));
                     sortOrder = getString(R.string.popular);
                     loadMovieData(sortOrder);
                     return true;
@@ -168,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     return false;
                 }else {
                     item.setChecked(true);
+                    saveSharedPreferenceOrder(getString(R.string.top_rated));
                     sortOrder = getString(R.string.top_rated);
                     loadMovieData(sortOrder);
                     return true;
