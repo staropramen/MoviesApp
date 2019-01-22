@@ -21,7 +21,7 @@ public class NetworkUtils {
 
     //API Key
     private static final String API_KEY =
-            "673ca6ed38cbb77de6d3a17df821abd5";
+            "";
 
     //Query Parameters
     final static String KEY_PARAM = "api_key";
