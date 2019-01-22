@@ -1,11 +1,5 @@
 <resources>
-    <string name="app_name">MoviesApp</string>
-
-    <!-- API Key for Movie Database -->
-    <string name="api_key">673ca6ed38cbb77de6d3a17df821abd5</string>
-
-    <!-- Urls for the app -->
-    <string name="popular_url">http://api.themoviedb.org/3/movie</string>
+    <string name="app_name">Movies App</string>
 
     <!-- Menu strings-->
     <string name="sort_order">Sort Order</string>
@@ -13,5 +7,16 @@
     <string name="sort_top_rated">Top Rated</string>
     <string name="popular">popular</string>
     <string name="top_rated">top_rated</string>
+    <string name="refresh">Refresh</string>
+
+    <!-- Details Activity -->
+    <string name="details_name">Movie Details</string>
+    <string name="release_date">Release Date:</string>
+    <string name="averarge_rate">Average Rating:</string>
+    <string name="detail_error_message">An error has occurred, please go back and try again.</string>
+
+    <!-- Main Activity -->
+    <string name="error_message">An error has occurred, please try to refresh.</string>
+    <string name="no_network">Please connect to the internet and refresh.</string>
 
 </resources>

@@ -3,6 +3,8 @@ package com.example.android.moviesapp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +15,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.moviesapp.model.Movie;
+import com.example.android.moviesapp.utilities.MovieDateUtils;
 import com.example.android.moviesapp.utilities.NetworkUtils;
 import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 import com.squareup.picasso.Picasso;
@@ -29,13 +34,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private String TAG = MainActivity.class.getSimpleName();
     private MovieAdapter movieAdapter;
     private RecyclerView mRecyclerView;
+    private ProgressBar progressBar;
+    private TextView errorTextView;
     private String sortOrder;
+
+    private ConnectivityManager connectivityManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        errorTextView = (TextView) findViewById(R.id.tv_error_message_display);
         //Get a reference to Recycler View and set GridlayoutManager
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -56,7 +67,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     //Method to kick off the Background task
     private void loadMovieData(String sortOrder){
-        new FetchMovieTask().execute(sortOrder);
+        //Check if there is an internet connection
+        connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+
+        //Load Movie Data if device is connected to internet, else show error message
+        if(activeNetwork != null && activeNetwork.isConnected()){
+            showMovieData();
+            new FetchMovieTask().execute(sortOrder);
+        }else {
+            showErrorMessage();
+            errorTextView.setText(R.string.no_network);
+        }
+
     }
 
     @Override
@@ -68,8 +91,26 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         startActivity(intentToStartDetailActivity);
     }
 
+    private void showMovieData() {
+        mRecyclerView.setVisibility(View.VISIBLE);
+        errorTextView.setVisibility(View.INVISIBLE);
+    }
+
+    private void showErrorMessage() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        errorTextView.setVisibility(View.VISIBLE);
+        //Default set text to error
+        errorTextView.setText(R.string.error_message);
+    }
+
     //Asynch Task to Load Data from API
     public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected ArrayList<Movie> doInBackground(String... params) {
@@ -82,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             URL moviesRequestUrl = NetworkUtils.builtUrl(preferredOrder);
 
             try {
-                Log.v(TAG, "Im in try in do in Background");
                 String jsonResponse = NetworkUtils.getHttpResponse(moviesRequestUrl);
                 ArrayList<Movie> movieJsonData = OpenMovieJsonUtils.getStringsFromJson(MainActivity.this, jsonResponse);
                 return movieJsonData;
@@ -94,9 +134,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         @Override
         protected void onPostExecute(ArrayList<Movie> moviesData) {
+            progressBar.setVisibility(View.INVISIBLE);
             if(moviesData != null){
-                Log.v(TAG, "Im in PostExecute if statement");
+                showMovieData();
                 movieAdapter.setMoviesArray(moviesData);
+            }else {
+                showErrorMessage();
             }
         }
     }
@@ -105,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
-
         return true;
     }
 
@@ -130,6 +172,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     loadMovieData(sortOrder);
                     return true;
                 }
+            case R.id.refresh_button:
+                loadMovieData(sortOrder);
+                return true;
                 default:
                     return super.onOptionsItemSelected(item);
         }
