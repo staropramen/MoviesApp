@@ -1,5 +1,6 @@
 package com.example.android.moviesapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,11 +8,17 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +37,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieOnClickHandler {
+public class MainActivity extends AppCompatActivity
+        implements MovieAdapter.MovieOnClickHandler, LoaderManager.LoaderCallbacks<ArrayList<Movie>> {
 
     private String TAG = MainActivity.class.getSimpleName();
     private MovieAdapter movieAdapter;
@@ -43,6 +51,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private String PREF_FILENAME = "SortOrderFile";
     private String PREF_VAL_KEY = "PreferredSortOrder";
+
+    private static final String PREFERRED_SORT_ORDER = "preferred_sort_order";
+
+    private static final int MOVIE_LOADER = 22;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +90,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         //Load Movie Data if device is connected to internet, else show error message
         if(activeNetwork != null && activeNetwork.isConnected()){
             showMovieData();
-            new FetchMovieTask().execute(sortOrder);
+            //Make a Bundle for parameters
+            Bundle bundle = new Bundle();
+            bundle.putString(PREFERRED_SORT_ORDER, sortOrder);
+            //Kick off the loader
+            LoaderManager loaderManager = getSupportLoaderManager();
+            Loader<Object> movieLoader = loaderManager.getLoader(MOVIE_LOADER);
+            if(movieLoader == null){
+                loaderManager.initLoader(MOVIE_LOADER, bundle, this).forceLoad();
+            }else {
+                loaderManager.restartLoader(MOVIE_LOADER, bundle,this).forceLoad();
+            }
+
         }else {
             showErrorMessage();
             errorTextView.setText(R.string.no_network);
@@ -120,45 +143,57 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         editor.commit();
     }
 
-    //Asynch Task to Load Data from API
-    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>>{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected ArrayList<Movie> doInBackground(String... params) {
-            //Return null if param is empty
-            if(params.length == 0){
-                return null;
+    //Loader
+    @SuppressLint("StaticFieldLeak")
+    @NonNull
+    @Override
+    public Loader<ArrayList<Movie>> onCreateLoader(int i, @Nullable final Bundle bundle) {
+        return new AsyncTaskLoader<ArrayList<Movie>>(this) {
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                if(bundle == null){
+                    return;
+                }
+                progressBar.setVisibility(View.VISIBLE);
             }
 
-            String preferredOrder = params[0];
-            URL moviesRequestUrl = NetworkUtils.builtUrl(preferredOrder);
+            @Override
+            public ArrayList<Movie> loadInBackground() {
 
-            try {
-                String jsonResponse = NetworkUtils.getHttpResponse(moviesRequestUrl);
-                ArrayList<Movie> movieJsonData = OpenMovieJsonUtils.getStringsFromJson(MainActivity.this, jsonResponse);
-                return movieJsonData;
-            }catch (Exception e){
-                e.printStackTrace();
-                return null;
-            }
-        }
+                String preferredOrder = bundle.getString(PREFERRED_SORT_ORDER);
+                //Return null if param is empty
+                if(preferredOrder == null || TextUtils.isEmpty(preferredOrder)){
+                    return null;
+                }
+                URL moviesRequestUrl = NetworkUtils.builtUrl(preferredOrder);
 
-        @Override
-        protected void onPostExecute(ArrayList<Movie> moviesData) {
-            progressBar.setVisibility(View.INVISIBLE);
-            if(moviesData != null){
-                showMovieData();
-                movieAdapter.setMoviesArray(moviesData);
-            }else {
-                showErrorMessage();
+                try {
+                    Log.v("Loader", "Im in try!!");
+                    String jsonResponse = NetworkUtils.getHttpResponse(moviesRequestUrl);
+                    return OpenMovieJsonUtils.getStringsFromJson(MainActivity.this, jsonResponse);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return null;
+                }
             }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<ArrayList<Movie>> loader, ArrayList<Movie> movies) {
+        progressBar.setVisibility(View.INVISIBLE);
+        if(movies != null){
+            showMovieData();
+            movieAdapter.setMoviesArray(movies);
+        }else {
+            showErrorMessage();
         }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<ArrayList<Movie>> loader) {
+
     }
 
     @Override
