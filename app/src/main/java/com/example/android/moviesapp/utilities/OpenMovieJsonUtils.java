@@ -3,17 +3,13 @@ package com.example.android.moviesapp.utilities;
 import android.content.Context;
 
 import com.example.android.moviesapp.model.Movie;
-import com.example.android.moviesapp.model.MoviesWrapper;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class OpenMovieJsonUtils {
 
