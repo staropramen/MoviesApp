@@ -3,12 +3,17 @@ package com.example.android.moviesapp.utilities;
 import android.content.Context;
 
 import com.example.android.moviesapp.model.Movie;
+import com.example.android.moviesapp.model.MoviesWrapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class OpenMovieJsonUtils {
 
@@ -16,13 +21,7 @@ public class OpenMovieJsonUtils {
     public static ArrayList<Movie> getStringsFromJson(Context context, String movieJsonStr) throws JSONException {
 
         //Objects to retrieve in variables
-        final String MOVIE_ID = "id";
         final String MAIN_ARRAY = "results";
-        final String MOVIE_TITLE = "original_title";
-        final String RELEASE_DATE = "release_date";
-        final String POSTER_PATH = "poster_path";
-        final String AVERAGE_VOTE = "vote_average";
-        final String PLOT_SYNOPSIS = "overview";
 
         //Make String a JsonObject
         JSONObject movieJson = new JSONObject(movieJsonStr);
@@ -39,18 +38,17 @@ public class OpenMovieJsonUtils {
 
             JSONObject currentMovie = moviesJsonArray.getJSONObject(i);
 
-            String movieTitle = currentMovie.getString(MOVIE_TITLE);
-            String movieId = currentMovie.getString(MOVIE_ID);
-            String releaseDate = currentMovie.getString(RELEASE_DATE);
-            String posterPath = currentMovie.getString(POSTER_PATH);
-            String averageVote = currentMovie.getString(AVERAGE_VOTE);
-            String plotSynopsis = currentMovie.getString(PLOT_SYNOPSIS);
 
-            Movie movie = new Movie(movieId, movieTitle, releaseDate,posterPath,averageVote,plotSynopsis);
+            Movie movie = generateMovieFromJson(currentMovie);
 
             moviesArray.add(movie);
         }
 
         return moviesArray;
+    }
+
+    private  static Movie generateMovieFromJson(JSONObject jsonObject){
+        Movie movie = new Gson().fromJson(jsonObject.toString(), Movie.class);
+        return movie;
     }
 }

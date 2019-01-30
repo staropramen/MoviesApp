@@ -1,17 +1,22 @@
 package com.example.android.moviesapp.model;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Movie implements Parcelable {
+import com.google.gson.annotations.SerializedName;
 
+public class Movie implements Parcelable {
+    @SerializedName("id")
     private String movieId;
+    @SerializedName("original_title")
     private String originalTitle;
+    @SerializedName("release_date")
     private String releaseDate;
+    @SerializedName("poster_path")
     private String posterPath;
+    @SerializedName("vote_average")
     private String voteAverage;
+    @SerializedName("overview")
     private String plotSynopsis;
 
     //Constructor

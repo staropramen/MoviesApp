@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.utilities.MovieDateUtils;
+import com.example.android.moviesapp.utilities.MovieJsonResponse;
 import com.example.android.moviesapp.utilities.NetworkUtils;
 import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 import com.squareup.picasso.Picasso;
@@ -169,7 +170,6 @@ public class MainActivity extends AppCompatActivity
                 URL moviesRequestUrl = NetworkUtils.builtUrl(preferredOrder);
 
                 try {
-                    Log.v("Loader", "Im in try!!");
                     String jsonResponse = NetworkUtils.getHttpResponse(moviesRequestUrl);
                     return OpenMovieJsonUtils.getStringsFromJson(MainActivity.this, jsonResponse);
                 }catch (Exception e){
