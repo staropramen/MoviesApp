@@ -43,6 +43,24 @@ public class NetworkUtils {
         return url;
     }
 
+    //Bulit Url for Movie Details
+    public static URL builtDetailsUrl(String detailsQuery, String movieId){
+        Uri builtUri = Uri.parse(MOVIE_DATABASE_URL_POPULAR).buildUpon()
+                .appendPath(movieId)
+                .appendPath(detailsQuery)
+                .appendQueryParameter(KEY_PARAM, API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
     //Return response from Http request
     public static String getHttpResponse(URL url) throws IOException{
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
