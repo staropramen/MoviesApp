@@ -16,6 +16,7 @@ public class OpenMovieJsonUtils {
     public static ArrayList<Movie> getStringsFromJson(Context context, String movieJsonStr) throws JSONException {
 
         //Objects to retrieve in variables
+        final String MOVIE_ID = "id";
         final String MAIN_ARRAY = "results";
         final String MOVIE_TITLE = "original_title";
         final String RELEASE_DATE = "release_date";
@@ -39,12 +40,13 @@ public class OpenMovieJsonUtils {
             JSONObject currentMovie = moviesJsonArray.getJSONObject(i);
 
             String movieTitle = currentMovie.getString(MOVIE_TITLE);
+            String movieId = currentMovie.getString(MOVIE_ID);
             String releaseDate = currentMovie.getString(RELEASE_DATE);
             String posterPath = currentMovie.getString(POSTER_PATH);
             String averageVote = currentMovie.getString(AVERAGE_VOTE);
             String plotSynopsis = currentMovie.getString(PLOT_SYNOPSIS);
 
-            Movie movie = new Movie(movieTitle, releaseDate,posterPath,averageVote,plotSynopsis);
+            Movie movie = new Movie(movieId, movieTitle, releaseDate,posterPath,averageVote,plotSynopsis);
 
             moviesArray.add(movie);
         }
