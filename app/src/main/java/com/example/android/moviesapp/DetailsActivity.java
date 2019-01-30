@@ -1,5 +1,6 @@
 package com.example.android.moviesapp;
 
+import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -7,19 +8,14 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.android.moviesapp.databinding.ActivityDetailsBinding;
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.utilities.MovieDateUtils;
 import com.squareup.picasso.Picasso;
 
 public class DetailsActivity extends AppCompatActivity {
 
-    private TextView mMovieTitle;
-    private TextView mReleaseDate;
-    private TextView mAverageRate;
-    private TextView mPlotSynopsis;
-    private ImageView mImagePoster;
-    private ScrollView movieScrollView;
-    private TextView detailErrorMessage;
+    ActivityDetailsBinding mBinding;
 
     private Movie movie;
 
@@ -30,13 +26,7 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        mMovieTitle = (TextView) findViewById(R.id.tv_movie_title);
-        mReleaseDate = (TextView) findViewById(R.id.tv_release_date);
-        mAverageRate = (TextView) findViewById(R.id.tv_average_rate);
-        mPlotSynopsis = (TextView) findViewById(R.id.tv_plot_synopsis);
-        mImagePoster = (ImageView) findViewById(R.id.iv_movie_thumbnail);
-        movieScrollView = (ScrollView) findViewById(R.id.sv_movie_detail);
-        detailErrorMessage = (TextView) findViewById(R.id.tv_error_message_detail);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_details);
 
         //Set title of activity
         setTitle(getString(R.string.details_name));
@@ -46,19 +36,19 @@ public class DetailsActivity extends AppCompatActivity {
 
         //If movie not null set the views
         if(movie != null){
-            mMovieTitle.setText(movie.getOriginalTitle());
+            mBinding.tvMovieTitle.setText(movie.getOriginalTitle());
             String newDate = MovieDateUtils.makePrettyDate(movie.getReleaseDate());
-            mReleaseDate.setText(newDate);
-            mAverageRate.setText(movie.getVoteAverage());
-            mPlotSynopsis.setText(movie.getPlotSynopsis());
+            mBinding.tvReleaseDate.setText(newDate);
+            mBinding.tvAverageRate.setText(movie.getVoteAverage());
+            mBinding.tvPlotSynopsis.setText(movie.getPlotSynopsis());
 
             Picasso.get()
                     .load(baseImageUrl + movie.getPosterPath())
-                    .into(mImagePoster);
+                    .into(mBinding.ivMovieThumbnail);
         } else {
             //Show Error Message
-            movieScrollView.setVisibility(View.INVISIBLE);
-            detailErrorMessage.setVisibility(View.VISIBLE);
+            mBinding.svMovieDetail.setVisibility(View.INVISIBLE);
+            mBinding.tvErrorMessageDetail.setVisibility(View.VISIBLE);
         }
     }
 }
