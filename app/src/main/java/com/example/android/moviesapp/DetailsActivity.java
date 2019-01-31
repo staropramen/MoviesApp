@@ -20,6 +20,8 @@ import android.view.View;
 
 import com.example.android.moviesapp.Adapter.ReviewAdapter;
 import com.example.android.moviesapp.Adapter.VideoAdapter;
+import com.example.android.moviesapp.database.AppDatabase;
+import com.example.android.moviesapp.database.MovieEntry;
 import com.example.android.moviesapp.databinding.ActivityDetailsBinding;
 import com.example.android.moviesapp.model.Detail;
 import com.example.android.moviesapp.model.Movie;
@@ -51,12 +53,16 @@ public class DetailsActivity extends AppCompatActivity
 
     private String baseImageUrl = "https://image.tmdb.org/t/p/w185";
 
+    private AppDatabase mDb;
+
     private boolean isFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+
+        mDb = AppDatabase.getInstance(getApplicationContext());
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_details);
 
@@ -105,11 +111,19 @@ public class DetailsActivity extends AppCompatActivity
                     isFavorite = false;
                 } else {
                     mBinding.ivFavorite.setColorFilter(Color.YELLOW);
+                    saveMovieInDb();
                     isFavorite = true;
                 }
 
             }
         });
+    }
+
+    //Save Movie to Database
+    private void saveMovieInDb() {
+        MovieEntry movieEntry = new MovieEntry(movie.getMovieId(), movie.getOriginalTitle(),
+                movie.getReleaseDate(), movie.getPosterPath(), movie.getVoteAverage(), movie.getPlotSynopsis());
+        mDb.movieDao().insertMovie(movieEntry);
     }
 
     //Kick off the Background Task

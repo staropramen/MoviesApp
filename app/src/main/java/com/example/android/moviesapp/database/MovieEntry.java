@@ -2,6 +2,7 @@ package com.example.android.moviesapp.database;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "movie")
@@ -21,6 +22,17 @@ public class MovieEntry {
     private String voteAverage;
     @ColumnInfo(name = "plot_synopsis")
     private String plotSynopsis;
+
+    @Ignore
+    public MovieEntry(String movieId, String originalTitle, String releaseDate,
+                      String posterPath, String voteAverage, String plotSynopsis) {
+        this.movieId = movieId;
+        this.originalTitle = originalTitle;
+        this.releaseDate = releaseDate;
+        this.posterPath = posterPath;
+        this.voteAverage = voteAverage;
+        this.plotSynopsis = plotSynopsis;
+    }
 
     public MovieEntry(int id, String movieId, String originalTitle, String releaseDate,
                       String posterPath, String voteAverage, String plotSynopsis) {
