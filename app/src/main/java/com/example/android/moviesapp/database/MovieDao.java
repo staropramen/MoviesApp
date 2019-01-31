@@ -8,12 +8,13 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Dao
 public interface MovieDao {
 
     @Query("SELECT * FROM movie ORDER BY movie_id")
-    ArrayList<MovieEntry> loadAllMovies();
+    List<MovieEntry> loadAllMovies();
 
     @Insert
     void insertMovie(MovieEntry movieEntry);
