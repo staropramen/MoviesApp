@@ -7,4 +7,7 @@
     <color name="menuBarRed">#ab0707</color>
     <color name="activityBackgroundBlue">#0b1d77</color>
     <color name="textLightBlue">#d0d8ff</color>
+
+    <color name="white">#ffffff</color>
+    <color name="yellow">#faf700</color>
 </resources>

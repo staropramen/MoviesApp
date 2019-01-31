@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class Movie implements Parcelable {
     @SerializedName("id")
     private String movieId;
@@ -19,8 +21,10 @@ public class Movie implements Parcelable {
     @SerializedName("overview")
     private String plotSynopsis;
 
+
     //Constructor
-    public Movie(String movieId, String originalTitle, String releaseDate, String posterPath, String voteAverage, String plotSynopsis) {
+    public Movie(String movieId, String originalTitle, String releaseDate, String posterPath, String voteAverage,
+                 String plotSynopsis) {
         this.movieId = movieId;
         this.originalTitle = originalTitle;
         this.releaseDate = releaseDate;

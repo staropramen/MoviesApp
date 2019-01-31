@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,9 +18,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import com.example.android.moviesapp.Adapter.ReviewAdapter;
 import com.example.android.moviesapp.Adapter.VideoAdapter;
 import com.example.android.moviesapp.databinding.ActivityDetailsBinding;
+import com.example.android.moviesapp.model.Detail;
 import com.example.android.moviesapp.model.Movie;
+import com.example.android.moviesapp.model.MovieReview;
 import com.example.android.moviesapp.model.MovieTrailer;
 import com.example.android.moviesapp.utilities.MovieDateUtils;
 import com.example.android.moviesapp.utilities.NetworkUtils;
@@ -30,20 +34,24 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class DetailsActivity extends AppCompatActivity
-        implements VideoAdapter.VideoOnClickHandler, LoaderManager.LoaderCallbacks<ArrayList<MovieTrailer>> {
+        implements VideoAdapter.VideoOnClickHandler, LoaderManager.LoaderCallbacks<Detail> {
 
     ActivityDetailsBinding mBinding;
 
     private Movie movie;
     private VideoAdapter videoAdapter;
+    private ReviewAdapter reviewAdapter;
 
     private String MOVIE_QUERY_ID = "movie-query-id";
     private String PATH_TRAILER = "videos";
+    private String PATH_REVIEWS= "reviews";
     private static final int DETAIL_LOADER = 45;
     private String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
     private String YOUTUBE_APP_BASE = "vnd.youtube:";
 
     private String baseImageUrl = "https://image.tmdb.org/t/p/w185";
+
+    private boolean isFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,13 +85,31 @@ public class DetailsActivity extends AppCompatActivity
 
         //Set Layout Manager
         mBinding.trailerRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.reviewRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //Set Adapter
         videoAdapter = new VideoAdapter(this);
         mBinding.trailerRecyclerView.setAdapter(videoAdapter);
+        reviewAdapter = new ReviewAdapter();
+        mBinding.reviewRecyclerView.setAdapter(reviewAdapter);
 
         String movieId = movie.getMovieId();
         loadMovieDetails(movieId);
+
+        //Set OnClick for Favorites Button
+        mBinding.ivFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isFavorite){
+                    mBinding.ivFavorite.setColorFilter(Color.WHITE);
+                    isFavorite = false;
+                } else {
+                    mBinding.ivFavorite.setColorFilter(Color.YELLOW);
+                    isFavorite = true;
+                }
+
+            }
+        });
     }
 
     //Kick off the Background Task
@@ -117,8 +143,8 @@ public class DetailsActivity extends AppCompatActivity
     @SuppressLint("StaticFieldLeak")
     @NonNull
     @Override
-    public Loader<ArrayList<MovieTrailer>> onCreateLoader(int i, @Nullable final Bundle bundle) {
-        return new AsyncTaskLoader<ArrayList<MovieTrailer>>(this) {
+    public Loader<Detail> onCreateLoader(int i, @Nullable final Bundle bundle) {
+        return new AsyncTaskLoader<Detail>(this) {
             @Override
             protected void onStartLoading() {
                 super.onStartLoading();
@@ -131,18 +157,24 @@ public class DetailsActivity extends AppCompatActivity
 
             @Nullable
             @Override
-            public ArrayList<MovieTrailer> loadInBackground() {
-                Log.v("!!!!!!!", "IM HERE");
+            public Detail loadInBackground() {
                 String movieId = bundle.getString(MOVIE_QUERY_ID);
                 //Return null if param is empty
                 if(movieId == null || TextUtils.isEmpty(movieId)){
                     return null;
                 }
                 URL trailerRequestUrl = NetworkUtils.builtDetailsUrl(PATH_TRAILER, movieId);
+                URL reviewRequestUrl = NetworkUtils.builtDetailsUrl(PATH_REVIEWS, movieId);
+
+
 
                 try {
                     String jsonResponse = NetworkUtils.getHttpResponse(trailerRequestUrl);
-                    return OpenMovieJsonUtils.getTrailerStingsFromJson(DetailsActivity.this, jsonResponse);
+                    ArrayList<MovieTrailer> movieTrailers = OpenMovieJsonUtils.getTrailerStingsFromJson(DetailsActivity.this, jsonResponse);
+                    String jsonReviewResponse = NetworkUtils.getHttpResponse(reviewRequestUrl);
+                    ArrayList<MovieReview> movieReviews = OpenMovieJsonUtils.getReviewStingsFromJson(DetailsActivity.this, jsonReviewResponse);
+                    Detail detail = new Detail(movieTrailers, movieReviews);
+                    return detail;
                 }catch (Exception e){
                     e.printStackTrace();
                     return null;
@@ -152,15 +184,18 @@ public class DetailsActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<ArrayList<MovieTrailer>> loader, ArrayList<MovieTrailer> movieTrailers) {
-        if(movieTrailers != null){
+    public void onLoadFinished(@NonNull Loader<Detail> loader, Detail detail) {
+        if(detail != null){
             mBinding.trailerRecyclerView.setVisibility(View.VISIBLE);
+            ArrayList<MovieTrailer> movieTrailers = detail.getMovieTrailers();
+            ArrayList<MovieReview> movieReviews = detail.getMovieReviews();
             videoAdapter.setMovieTrailerArray(movieTrailers);
+            reviewAdapter.setMovieReviewArray(movieReviews);
         }
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<ArrayList<MovieTrailer>> loader) {
+    public void onLoaderReset(@NonNull Loader<Detail> loader) {
 
     }
 }
