@@ -13,11 +13,12 @@ import com.example.android.moviesapp.model.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
     //Global Variables
-    private ArrayList<Movie> moviesArray;
+    private List<Movie> moviesArray;
     private String baseImageUrl = "https://image.tmdb.org/t/p/w185";
 
     private final MovieOnClickHandler movieOnClickHandler;
@@ -78,7 +79,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     //Function to set moviesArray
-    public void setMoviesArray(ArrayList<Movie> moviesArrayToSet){
+    public void setMoviesArray(List<Movie> moviesArrayToSet){
         moviesArray = moviesArrayToSet;
         notifyDataSetChanged();
     }

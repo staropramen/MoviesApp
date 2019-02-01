@@ -12,11 +12,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class OpenMovieJsonUtils {
 
     //Get Strings from JSON
-    public static ArrayList<Movie> getStringsFromJson(Context context, String movieJsonStr) throws JSONException {
+    public static List<Movie> getStringsFromJson(Context context, String movieJsonStr) throws JSONException {
 
         //Objects to retrieve in variables
         final String MAIN_ARRAY = "results";
@@ -24,11 +25,11 @@ public class OpenMovieJsonUtils {
         //Make String a JsonObject
         JSONObject movieJson = new JSONObject(movieJsonStr);
 
-        //Initialize String Array to store Data and set it to null
-        ArrayList<Movie> moviesArray = new ArrayList<Movie>();
-
         //Get Array with the movies inside
         JSONArray moviesJsonArray = movieJson.getJSONArray(MAIN_ARRAY);
+
+        //Initialize String Array to store Data and set it to null
+        List<Movie> moviesList = new ArrayList<>(moviesJsonArray.length());
 
         //Store Movies Inormation in Array inside moviesArray
         for (int i = 0; i < moviesJsonArray.length(); i++){
@@ -37,10 +38,10 @@ public class OpenMovieJsonUtils {
 
             Movie movie = generateMovieFromJson(currentMovie);
 
-            moviesArray.add(movie);
+            moviesList.add(movie);
         }
 
-        return moviesArray;
+        return moviesList;
     }
 
     private  static Movie generateMovieFromJson(JSONObject jsonObject){

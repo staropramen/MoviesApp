@@ -34,10 +34,10 @@ import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 
 import java.net.URL;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements MovieAdapter.MovieOnClickHandler, LoaderManager.LoaderCallbacks<ArrayList<Movie>> {
+        implements MovieAdapter.MovieOnClickHandler, LoaderManager.LoaderCallbacks<List<Movie>> {
 
     private String TAG = MainActivity.class.getSimpleName();
     private MovieAdapter movieAdapter;
@@ -127,14 +127,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 Log.v("LOG", "Database query");
-                ArrayList<Movie> movieArrayList = new ArrayList<Movie>(movies);
                 progressBar.setVisibility(View.INVISIBLE);
-                if(movieArrayList.isEmpty()){
+                if(movies.isEmpty()){
                     showErrorMessage();
                     errorTextView.setText(R.string.no_favorite);
                 } else {
                     showMovieData();
-                    movieAdapter.setMoviesArray(movieArrayList);
+                    movieAdapter.setMoviesArray(movies);
                 }
             }
         });
@@ -178,8 +177,8 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("StaticFieldLeak")
     @NonNull
     @Override
-    public Loader<ArrayList<Movie>> onCreateLoader(int i, @Nullable final Bundle bundle) {
-        return new AsyncTaskLoader<ArrayList<Movie>>(this) {
+    public Loader<List<Movie>> onCreateLoader(int i, @Nullable final Bundle bundle) {
+        return new AsyncTaskLoader<List<Movie>>(this) {
             @Override
             protected void onStartLoading() {
                 super.onStartLoading();
@@ -190,7 +189,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override
-            public ArrayList<Movie> loadInBackground() {
+            public List<Movie> loadInBackground() {
 
                 String preferredOrder = bundle.getString(PREFERRED_SORT_ORDER);
                 //Return null if param is empty
@@ -211,7 +210,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<ArrayList<Movie>> loader, ArrayList<Movie> movies) {
+    public void onLoadFinished(@NonNull Loader<List<Movie>> loader, List<Movie> movies) {
         progressBar.setVisibility(View.INVISIBLE);
         if(movies != null){
             showMovieData();
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<ArrayList<Movie>> loader) {
+    public void onLoaderReset(@NonNull Loader<List<Movie>> loader) {
 
     }
 
