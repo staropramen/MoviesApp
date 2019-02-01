@@ -72,14 +72,10 @@ public class DetailsActivity extends AppCompatActivity
 
         //Get movie object from Intent
         movie = (Movie) getIntent().getParcelableExtra(MOVIE_EXTRA);
-        isFavorite = getIntent().getExtras().getBoolean(IS_FAV_EXTRA);
+        //isFavorite = getIntent().getExtras().getBoolean(IS_FAV_EXTRA);
 
         //Set Fav Star color
-        if(isFavorite){
-            mBinding.ivFavorite.setColorFilter(Color.YELLOW);
-        } else {
-            mBinding.ivFavorite.setColorFilter(Color.WHITE);
-        }
+        checkIfIsFav(movie.getMovieId());
 
         //If movie not null set the views
         if(movie != null){
@@ -148,7 +144,28 @@ public class DetailsActivity extends AppCompatActivity
             @Override
             public void run() {
                 mDb.movieDao().deleteByMovieId(movieId);
-                Log.v("LOG", "DELETE");
+            }
+        });
+    }
+
+    //Check if Movie is in Database
+    private void checkIfIsFav(final String movieId){
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final Movie movie = mDb.movieDao().checkForMovie(movieId);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(movie == null){
+                            mBinding.ivFavorite.setColorFilter(Color.WHITE);
+                            isFavorite = false;
+                        }else {
+                            mBinding.ivFavorite.setColorFilter(Color.YELLOW);
+                            isFavorite = true;
+                        }
+                    }
+                });
             }
         });
     }

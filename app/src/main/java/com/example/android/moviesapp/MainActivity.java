@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity
             //Make a Bundle for parameters
             Bundle bundle = new Bundle();
             bundle.putString(PREFERRED_SORT_ORDER, sortOrder);
+            Log.v("LOG", "JSON API Query");
             //Kick off the loader
             LoaderManager loaderManager = getSupportLoaderManager();
             Loader<Object> movieLoader = loaderManager.getLoader(MOVIE_LOADER);
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
+                Log.v("LOG", "Databasequerie");
                 final List<Movie> movieEntries =  mDb.movieDao().loadAllMovies();
                 runOnUiThread(new Runnable() {
                     @Override
@@ -144,31 +146,12 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private boolean checkIfFav(String movieId){
-        boolean isFav;
-        try {
-            Movie movie = mDb.movieDao().checkForMovie(movieId);
-
-            if(movie == null){
-                isFav = false;
-            }else {
-                isFav = true;
-            }
-        }catch (NullPointerException e){
-            isFav = false;
-            e.printStackTrace();
-        }
-        return isFav;
-    }
-
     @Override
     public void onClick(Movie movie) {
         Context context = this;
         Class destinationClass = DetailsActivity.class;
-        boolean isFav = checkIfFav(movie.getMovieId());
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         intentToStartDetailActivity.putExtra(MOVIE_EXTRA, movie);
-        intentToStartDetailActivity.putExtra(IS_FAV_EXTRA, isFav);
         startActivity(intentToStartDetailActivity);
     }
 
