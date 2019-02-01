@@ -1,5 +1,6 @@
 package com.example.android.moviesapp.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -16,7 +17,7 @@ import java.util.List;
 public interface MovieDao {
 
     @Query("SELECT * FROM movie ORDER BY movie_id")
-    List<Movie> loadAllMovies();
+    LiveData<List<Movie>> loadAllMovies();
 
     @Query("SELECT * FROM movie WHERE movie_id = :movie_id")
     Movie checkForMovie(String movie_id);

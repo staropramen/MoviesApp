@@ -1,6 +1,8 @@
 package com.example.android.moviesapp;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,14 +48,11 @@ public class MainActivity extends AppCompatActivity
 
     private AppDatabase mDb;
 
-    private boolean movieIsFav;
-
     private ConnectivityManager connectivityManager;
 
     private String PREF_FILENAME = "SortOrderFile";
     private String PREF_VAL_KEY = "PreferredSortOrder";
     private String MOVIE_EXTRA = "movie";
-    private String IS_FAV_EXTRA = "is-fav";
 
     private static final String PREFERRED_SORT_ORDER = "preferred_sort_order";
 
@@ -123,25 +122,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadDataFromDatabase(){
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+        final LiveData<List<Movie>> movieEntries =  mDb.movieDao().loadAllMovies();
+        movieEntries.observe(this, new Observer<List<Movie>>() {
             @Override
-            public void run() {
-                Log.v("LOG", "Databasequerie");
-                final List<Movie> movieEntries =  mDb.movieDao().loadAllMovies();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ArrayList<Movie> movieArrayList = new ArrayList<Movie>(movieEntries);
-                        progressBar.setVisibility(View.INVISIBLE);
-                        if(movieArrayList.isEmpty()){
-                            showErrorMessage();
-                            errorTextView.setText(R.string.no_favorite);
-                        } else {
-                            showMovieData();
-                            movieAdapter.setMoviesArray(movieArrayList);
-                        }
-                    }
-                });
+            public void onChanged(@Nullable List<Movie> movies) {
+                Log.v("LOG", "Database query");
+                ArrayList<Movie> movieArrayList = new ArrayList<Movie>(movies);
+                progressBar.setVisibility(View.INVISIBLE);
+                if(movieArrayList.isEmpty()){
+                    showErrorMessage();
+                    errorTextView.setText(R.string.no_favorite);
+                } else {
+                    showMovieData();
+                    movieAdapter.setMoviesArray(movieArrayList);
+                }
             }
         });
     }
