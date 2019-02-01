@@ -8,6 +8,8 @@
     <string name="popular">popular</string>
     <string name="top_rated">top_rated</string>
     <string name="refresh">Refresh</string>
+    <string name="sort_favorites">Favorites</string>
+    <string name="favorites">favorites</string>
 
     <!-- Details Activity -->
     <string name="details_name">Movie Details</string>
@@ -18,5 +20,6 @@
     <!-- Main Activity -->
     <string name="error_message">An error has occurred, please try to refresh.</string>
     <string name="no_network">Please connect to the internet and refresh.</string>
+    <string name="no_favorite">You still don\'t have favorites</string>
 
 </resources>

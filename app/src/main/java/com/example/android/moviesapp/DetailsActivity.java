@@ -21,7 +21,6 @@ import android.view.View;
 import com.example.android.moviesapp.Adapter.ReviewAdapter;
 import com.example.android.moviesapp.Adapter.VideoAdapter;
 import com.example.android.moviesapp.database.AppDatabase;
-import com.example.android.moviesapp.database.MovieEntry;
 import com.example.android.moviesapp.databinding.ActivityDetailsBinding;
 import com.example.android.moviesapp.model.Detail;
 import com.example.android.moviesapp.model.Movie;
@@ -50,12 +49,14 @@ public class DetailsActivity extends AppCompatActivity
     private static final int DETAIL_LOADER = 45;
     private String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
     private String YOUTUBE_APP_BASE = "vnd.youtube:";
+    private String MOVIE_EXTRA = "movie";
+    private String IS_FAV_EXTRA = "is-fav";
 
     private String baseImageUrl = "https://image.tmdb.org/t/p/w185";
 
     private AppDatabase mDb;
 
-    private boolean isFavorite = false;
+    private boolean isFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,15 @@ public class DetailsActivity extends AppCompatActivity
         setTitle(getString(R.string.details_name));
 
         //Get movie object from Intent
-        movie = (Movie) getIntent().getParcelableExtra("movie");
+        movie = (Movie) getIntent().getParcelableExtra(MOVIE_EXTRA);
+        isFavorite = getIntent().getExtras().getBoolean(IS_FAV_EXTRA);
+
+        //Set Fav Star color
+        if(isFavorite){
+            mBinding.ivFavorite.setColorFilter(Color.YELLOW);
+        } else {
+            mBinding.ivFavorite.setColorFilter(Color.WHITE);
+        }
 
         //If movie not null set the views
         if(movie != null){
@@ -108,6 +117,8 @@ public class DetailsActivity extends AppCompatActivity
             public void onClick(View view) {
                 if(isFavorite){
                     mBinding.ivFavorite.setColorFilter(Color.WHITE);
+                    //Delete from Database
+                    //mDb.movieDao().deleteMovie(movie);
                     isFavorite = false;
                 } else {
                     mBinding.ivFavorite.setColorFilter(Color.YELLOW);
@@ -121,7 +132,7 @@ public class DetailsActivity extends AppCompatActivity
 
     //Save Movie to Database
     private void saveMovieInDb() {
-        MovieEntry movieEntry = new MovieEntry(movie.getMovieId(), movie.getOriginalTitle(),
+        Movie movieEntry = new Movie(movie.getMovieId(), movie.getOriginalTitle(),
                 movie.getReleaseDate(), movie.getPosterPath(), movie.getVoteAverage(), movie.getPlotSynopsis());
         mDb.movieDao().insertMovie(movieEntry);
     }

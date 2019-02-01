@@ -7,6 +7,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import com.example.android.moviesapp.model.Movie;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +16,17 @@ import java.util.List;
 public interface MovieDao {
 
     @Query("SELECT * FROM movie ORDER BY movie_id")
-    List<MovieEntry> loadAllMovies();
+    List<Movie> loadAllMovies();
+
+    @Query("SELECT * FROM movie WHERE movie_id = :movie_id")
+    Movie checkForMovie(String movie_id);
 
     @Insert
-    void insertMovie(MovieEntry movieEntry);
+    void insertMovie(Movie movie);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateMovie(MovieEntry movieEntry);
+    void updateMovie(Movie movie);
 
     @Delete
-    void deleteMovie(MovieEntry movieEntry);
+    void deleteMovie(Movie movie);
 }

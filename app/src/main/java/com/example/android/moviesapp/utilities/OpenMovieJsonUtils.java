@@ -25,7 +25,7 @@ public class OpenMovieJsonUtils {
         JSONObject movieJson = new JSONObject(movieJsonStr);
 
         //Initialize String Array to store Data and set it to null
-        ArrayList<Movie> moviesArray = new ArrayList<>();
+        ArrayList<Movie> moviesArray = new ArrayList<Movie>();
 
         //Get Array with the movies inside
         JSONArray moviesJsonArray = movieJson.getJSONArray(MAIN_ARRAY);

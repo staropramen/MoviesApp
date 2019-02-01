@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,11 +25,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.moviesapp.Adapter.MovieAdapter;
+import com.example.android.moviesapp.database.AppDatabase;
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.utilities.NetworkUtils;
 import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -41,10 +44,16 @@ public class MainActivity extends AppCompatActivity
     private TextView errorTextView;
     private String sortOrder;
 
+    private AppDatabase mDb;
+
+    private boolean movieIsFav;
+
     private ConnectivityManager connectivityManager;
 
     private String PREF_FILENAME = "SortOrderFile";
     private String PREF_VAL_KEY = "PreferredSortOrder";
+    private String MOVIE_EXTRA = "movie";
+    private String IS_FAV_EXTRA = "is-fav";
 
     private static final String PREFERRED_SORT_ORDER = "preferred_sort_order";
 
@@ -54,6 +63,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mDb = AppDatabase.getInstance(getApplicationContext());
 
         progressBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         errorTextView = (TextView) findViewById(R.id.tv_error_message_display);
@@ -77,6 +88,14 @@ public class MainActivity extends AppCompatActivity
 
     //Method to kick off the Background task
     private void loadMovieData(String sortOrder){
+        if(sortOrder.equals(getString(R.string.favorites))){
+            loadDataFromDatabase();
+        } else {
+            loadDataFromInternet(sortOrder);
+        }
+    }
+
+    private void loadDataFromInternet(String sortOrder){
         //Check if there is an internet connection
         connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
@@ -100,15 +119,45 @@ public class MainActivity extends AppCompatActivity
             showErrorMessage();
             errorTextView.setText(R.string.no_network);
         }
+    }
 
+    private void loadDataFromDatabase(){
+        List<Movie> movieEntries =  mDb.movieDao().loadAllMovies();
+        ArrayList<Movie> movieArrayList = new ArrayList<Movie>(movieEntries);
+        progressBar.setVisibility(View.INVISIBLE);
+        if(movieArrayList.isEmpty()){
+            showErrorMessage();
+            errorTextView.setText(R.string.no_favorite);
+        } else {
+            showMovieData();
+            movieAdapter.setMoviesArray(movieArrayList);
+        }
+    }
+
+    private boolean checkIfFav(String movieId){
+        boolean isFav;
+        try {
+            Movie movie = mDb.movieDao().checkForMovie(movieId);
+            if(movie == null){
+                isFav = false;
+            }else {
+                isFav = true;
+            }
+        }catch (NullPointerException e){
+            isFav = false;
+            e.printStackTrace();
+        }
+        return isFav;
     }
 
     @Override
     public void onClick(Movie movie) {
         Context context = this;
         Class destinationClass = DetailsActivity.class;
+        boolean isFav = checkIfFav(movie.getMovieId());
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        intentToStartDetailActivity.putExtra("movie", movie);
+        intentToStartDetailActivity.putExtra(MOVIE_EXTRA, movie);
+        intentToStartDetailActivity.putExtra(IS_FAV_EXTRA, isFav);
         startActivity(intentToStartDetailActivity);
     }
 
@@ -216,6 +265,16 @@ public class MainActivity extends AppCompatActivity
                     item.setChecked(true);
                     saveSharedPreferenceOrder(getString(R.string.top_rated));
                     sortOrder = getString(R.string.top_rated);
+                    loadMovieData(sortOrder);
+                    return true;
+                }
+            case R.id.sort_favorites:
+                if(item.isChecked()){
+                    return false;
+                }else {
+                    item.setChecked(true);
+                    saveSharedPreferenceOrder(getString(R.string.favorites));
+                    sortOrder = getString(R.string.favorites);
                     loadMovieData(sortOrder);
                     return true;
                 }
