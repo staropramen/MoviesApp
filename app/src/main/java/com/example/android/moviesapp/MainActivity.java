@@ -122,22 +122,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadDataFromDatabase(){
-        List<Movie> movieEntries =  mDb.movieDao().loadAllMovies();
-        ArrayList<Movie> movieArrayList = new ArrayList<Movie>(movieEntries);
-        progressBar.setVisibility(View.INVISIBLE);
-        if(movieArrayList.isEmpty()){
-            showErrorMessage();
-            errorTextView.setText(R.string.no_favorite);
-        } else {
-            showMovieData();
-            movieAdapter.setMoviesArray(movieArrayList);
-        }
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<Movie> movieEntries =  mDb.movieDao().loadAllMovies();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ArrayList<Movie> movieArrayList = new ArrayList<Movie>(movieEntries);
+                        progressBar.setVisibility(View.INVISIBLE);
+                        if(movieArrayList.isEmpty()){
+                            showErrorMessage();
+                            errorTextView.setText(R.string.no_favorite);
+                        } else {
+                            showMovieData();
+                            movieAdapter.setMoviesArray(movieArrayList);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private boolean checkIfFav(String movieId){
         boolean isFav;
         try {
             Movie movie = mDb.movieDao().checkForMovie(movieId);
+
             if(movie == null){
                 isFav = false;
             }else {

@@ -117,8 +117,7 @@ public class DetailsActivity extends AppCompatActivity
             public void onClick(View view) {
                 if(isFavorite){
                     mBinding.ivFavorite.setColorFilter(Color.WHITE);
-                    //Delete from Database
-                    //mDb.movieDao().deleteMovie(movie);
+                    deleteMovieFromDb(movie.getMovieId());
                     isFavorite = false;
                 } else {
                     mBinding.ivFavorite.setColorFilter(Color.YELLOW);
@@ -132,9 +131,26 @@ public class DetailsActivity extends AppCompatActivity
 
     //Save Movie to Database
     private void saveMovieInDb() {
-        Movie movieEntry = new Movie(movie.getMovieId(), movie.getOriginalTitle(),
+        final Movie movieEntry = new Movie(movie.getMovieId(), movie.getOriginalTitle(),
                 movie.getReleaseDate(), movie.getPosterPath(), movie.getVoteAverage(), movie.getPlotSynopsis());
-        mDb.movieDao().insertMovie(movieEntry);
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.movieDao().insertMovie(movieEntry);
+            }
+        });
+    }
+
+    // Delete Movie from Db
+    private void deleteMovieFromDb(final String movieId){
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.movieDao().deleteByMovieId(movieId);
+                Log.v("LOG", "DELETE");
+            }
+        });
     }
 
     //Kick off the Background Task
