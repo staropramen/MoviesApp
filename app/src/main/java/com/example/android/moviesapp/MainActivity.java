@@ -1,8 +1,8 @@
 package com.example.android.moviesapp;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,7 +33,6 @@ import com.example.android.moviesapp.utilities.NetworkUtils;
 import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 
 import java.net.URL;
-import java.util.List;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity
     //Method to kick off the Background task
     private void loadMovieData(String sortOrder){
         if(sortOrder.equals(getString(R.string.favorites))){
-            loadDataFromDatabase();
+            setupMainViewModel();
         } else {
             loadDataFromInternet(sortOrder);
         }
@@ -121,12 +120,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void loadDataFromDatabase(){
-        final LiveData<List<Movie>> movieEntries =  mDb.movieDao().loadAllMovies();
-        movieEntries.observe(this, new Observer<List<Movie>>() {
+    private void setupMainViewModel(){
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                Log.v("LOG", "Database query");
+                Log.v("LOG", "Updating List from LiveData in ViewModel");
                 progressBar.setVisibility(View.INVISIBLE);
                 if(movies.isEmpty()){
                     showErrorMessage();
