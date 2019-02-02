@@ -3,6 +3,8 @@ package com.example.android.moviesapp.utilities;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.android.moviesapp.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -20,8 +22,7 @@ public class NetworkUtils {
             "http://api.themoviedb.org/3/movie";
 
     //API Key
-    private static final String API_KEY =
-            "673ca6ed38cbb77de6d3a17df821abd5";
+    private static final String API_KEY = BuildConfig.API_KEY;
 
     //Query Parameters
     final static String KEY_PARAM = "api_key";

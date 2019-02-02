@@ -5,11 +5,9 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -58,8 +56,6 @@ public class MainActivity extends AppCompatActivity
 
     private ConnectivityManager connectivityManager;
 
-    private String PREF_FILENAME = "SortOrderFile";
-    private String PREF_VAL_KEY = "PreferredSortOrder";
     private String MOVIE_EXTRA = "movie";
     private String LIST_STATE_KEY = "list-state";
     private String SORT_STATE_KEY = "state-sort-order";
@@ -97,7 +93,6 @@ public class MainActivity extends AppCompatActivity
 
         //Load the movie data, default sorted by popularity
         sortOrder = getSortOrder();
-        Log.d(TAG, sortOrder);
         loadMovieData(sortOrder);
     }
 
@@ -161,7 +156,6 @@ public class MainActivity extends AppCompatActivity
             //Make a Bundle for parameters
             Bundle bundle = new Bundle();
             bundle.putString(PREFERRED_SORT_ORDER, sortOrder);
-            Log.v("LOG", "JSON API Query");
             //Kick off the loader
             LoaderManager loaderManager = getSupportLoaderManager();
             Loader<Object> movieLoader = loaderManager.getLoader(MOVIE_LOADER);
@@ -183,7 +177,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 Log.v(TAG, "Updating List from LiveData in ViewModel");
-                Log.d(TAG, "IV 185");
                 progressBar.setVisibility(View.INVISIBLE);
                 if(movies.isEmpty()){
                     showErrorMessage();
@@ -217,19 +210,6 @@ public class MainActivity extends AppCompatActivity
         errorTextView.setText(R.string.error_message);
     }
 
-    /*private String getSharedPreferenceOrder() {
-        SharedPreferences sharedPrefs = getSharedPreferences(PREF_FILENAME, 0);
-        String order = sharedPrefs.getString(PREF_VAL_KEY, getString(R.string.popular));
-        return order;
-    }
-
-    private void saveSharedPreferenceOrder(String order){
-        SharedPreferences sharedPrefs = getSharedPreferences(PREF_FILENAME, 0);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString(PREF_VAL_KEY, order);
-        editor.commit();
-    }*/
-
     //Loader
     @SuppressLint("StaticFieldLeak")
     @NonNull
@@ -242,7 +222,6 @@ public class MainActivity extends AppCompatActivity
                 if(bundle == null){
                     return;
                 }
-                Log.d(TAG, "V 244");
                 progressBar.setVisibility(View.VISIBLE);
             }
 
@@ -268,7 +247,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Movie>> loader, List<Movie> movies) {
-        Log.d(TAG, "IV 271");
         progressBar.setVisibility(View.INVISIBLE);
         if(movies != null){
             showMovieData();
@@ -318,7 +296,6 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }else {
                     item.setChecked(true);
-                    //saveSharedPreferenceOrder(getString(R.string.popular));
                     sortOrder = getString(R.string.popular);
                     loadMovieData(sortOrder);
                     return true;
@@ -328,7 +305,6 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }else {
                     item.setChecked(true);
-                    //saveSharedPreferenceOrder(getString(R.string.top_rated));
                     sortOrder = getString(R.string.top_rated);
                     loadMovieData(sortOrder);
                     return true;
@@ -338,7 +314,6 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }else {
                     item.setChecked(true);
-                    //saveSharedPreferenceOrder(getString(R.string.favorites));
                     sortOrder = getString(R.string.favorites);
                     loadMovieData(sortOrder);
                     return true;
