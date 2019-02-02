@@ -19,7 +19,6 @@
                 <group
                     android:checkableBehavior="single">
                     <item android:id="@+id/sort_popular"
-                        android:checked="true"
                         android:title="@string/sort_popular"/>
                     <item android:id="@+id/sort_top_rated"
                         android:title="@string/sort_top_rated"/>

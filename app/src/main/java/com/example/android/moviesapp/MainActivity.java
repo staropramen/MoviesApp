@@ -37,6 +37,8 @@ import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 import java.net.URL;
 import java.util.List;
 
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.MovieOnClickHandler, LoaderManager.LoaderCallbacks<List<Movie>> {
 
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity
 
         if (mListState != null) {
             gridLayoutManager.onRestoreInstanceState(mListState);
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -180,6 +183,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 Log.v(TAG, "Updating List from LiveData in ViewModel");
+                Log.d(TAG, "IV 185");
                 progressBar.setVisibility(View.INVISIBLE);
                 if(movies.isEmpty()){
                     showErrorMessage();
@@ -238,12 +242,12 @@ public class MainActivity extends AppCompatActivity
                 if(bundle == null){
                     return;
                 }
+                Log.d(TAG, "V 244");
                 progressBar.setVisibility(View.VISIBLE);
             }
 
             @Override
             public List<Movie> loadInBackground() {
-
                 String preferredOrder = bundle.getString(PREFERRED_SORT_ORDER);
                 //Return null if param is empty
                 if(preferredOrder == null || TextUtils.isEmpty(preferredOrder)){
@@ -264,6 +268,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Movie>> loader, List<Movie> movies) {
+        Log.d(TAG, "IV 271");
         progressBar.setVisibility(View.INVISIBLE);
         if(movies != null){
             showMovieData();
@@ -275,7 +280,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoaderReset(@NonNull Loader<List<Movie>> loader) {
-
     }
 
     @Override
