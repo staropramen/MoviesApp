@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity
     private TextView errorTextView;
     private String sortOrder;
     private Parcelable mListState;
+    private int selectedMenuItem;
+    private MenuItem menuItem;
 
     private GridLayoutManager gridLayoutManager;
 
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity
     private String PREF_VAL_KEY = "PreferredSortOrder";
     private String MOVIE_EXTRA = "movie";
     private String LIST_STATE_KEY = "list-state";
+    private String SORT_STATE_KEY = "state-sort-order";
 
     private static final String PREFERRED_SORT_ORDER = "preferred_sort_order";
 
@@ -85,14 +88,22 @@ public class MainActivity extends AppCompatActivity
 
         mRecyclerView.setAdapter(movieAdapter);
 
+        if(savedInstanceState != null) {
+            selectedMenuItem = savedInstanceState.getInt(SORT_STATE_KEY);
+        }
+
+
         //Load the movie data, default sorted by popularity
-        sortOrder = getSharedPreferenceOrder();
+        sortOrder = getSortOrder();
+        Log.d(TAG, sortOrder);
         loadMovieData(sortOrder);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        outState.putInt(SORT_STATE_KEY, selectedMenuItem);
 
         mListState = gridLayoutManager.onSaveInstanceState();
         outState.putParcelable(LIST_STATE_KEY, mListState);
@@ -101,6 +112,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onRestoreInstanceState(Bundle outState) {
         if(outState != null)
+            selectedMenuItem = outState.getInt(SORT_STATE_KEY);
             mListState = outState.getParcelable(LIST_STATE_KEY);
     }
 
@@ -111,6 +123,19 @@ public class MainActivity extends AppCompatActivity
         if (mListState != null) {
             gridLayoutManager.onRestoreInstanceState(mListState);
         }
+    }
+
+    //Get sortOrder
+    private String getSortOrder(){
+        String sortOrder;
+        if(selectedMenuItem == R.id.sort_top_rated){
+            sortOrder = getString(R.string.top_rated);
+        }else if(selectedMenuItem == R.id.sort_favorites){
+            sortOrder = getString(R.string.favorites);
+        } else {
+            sortOrder = getString(R.string.popular);
+        }
+        return sortOrder;
     }
 
     //Method to kick off the Background task
@@ -188,7 +213,7 @@ public class MainActivity extends AppCompatActivity
         errorTextView.setText(R.string.error_message);
     }
 
-    private String getSharedPreferenceOrder() {
+    /*private String getSharedPreferenceOrder() {
         SharedPreferences sharedPrefs = getSharedPreferences(PREF_FILENAME, 0);
         String order = sharedPrefs.getString(PREF_VAL_KEY, getString(R.string.popular));
         return order;
@@ -199,7 +224,7 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(PREF_VAL_KEY, order);
         editor.commit();
-    }
+    }*/
 
     //Loader
     @SuppressLint("StaticFieldLeak")
@@ -257,6 +282,27 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
+        switch (selectedMenuItem){
+            case R.id.sort_popular:
+                menuItem = menu.findItem(R.id.sort_popular);
+                menuItem.setChecked(true);
+                sortOrder = getString(R.string.popular);
+                break;
+            case R.id.sort_top_rated:
+                menuItem = menu.findItem(R.id.sort_top_rated);
+                menuItem.setChecked(true);
+                sortOrder = getString(R.string.top_rated);
+                break;
+            case R.id.sort_favorites:
+                menuItem = menu.findItem(R.id.sort_favorites);
+                menuItem.setChecked(true);
+                sortOrder = getString(R.string.favorites);
+                break;
+                default:
+                    menuItem = menu.findItem(R.id.sort_popular);
+                    menuItem.setChecked(true);
+                    sortOrder = getString(R.string.popular);
+        }
         return true;
     }
 
@@ -268,7 +314,7 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }else {
                     item.setChecked(true);
-                    saveSharedPreferenceOrder(getString(R.string.popular));
+                    //saveSharedPreferenceOrder(getString(R.string.popular));
                     sortOrder = getString(R.string.popular);
                     loadMovieData(sortOrder);
                     return true;
@@ -278,7 +324,7 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }else {
                     item.setChecked(true);
-                    saveSharedPreferenceOrder(getString(R.string.top_rated));
+                    //saveSharedPreferenceOrder(getString(R.string.top_rated));
                     sortOrder = getString(R.string.top_rated);
                     loadMovieData(sortOrder);
                     return true;
@@ -288,7 +334,7 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }else {
                     item.setChecked(true);
-                    saveSharedPreferenceOrder(getString(R.string.favorites));
+                    //saveSharedPreferenceOrder(getString(R.string.favorites));
                     sortOrder = getString(R.string.favorites);
                     loadMovieData(sortOrder);
                     return true;
