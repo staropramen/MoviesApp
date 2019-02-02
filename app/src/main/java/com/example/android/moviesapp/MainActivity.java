@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -44,6 +46,9 @@ public class MainActivity extends AppCompatActivity
     private ProgressBar progressBar;
     private TextView errorTextView;
     private String sortOrder;
+    private Parcelable mListState;
+
+    private GridLayoutManager gridLayoutManager;
 
     private AppDatabase mDb;
 
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity
     private String PREF_FILENAME = "SortOrderFile";
     private String PREF_VAL_KEY = "PreferredSortOrder";
     private String MOVIE_EXTRA = "movie";
+    private String LIST_STATE_KEY = "list-state";
 
     private static final String PREFERRED_SORT_ORDER = "preferred_sort_order";
 
@@ -69,7 +75,7 @@ public class MainActivity extends AppCompatActivity
         //Get a reference to Recycler View and set GridlayoutManager
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        GridLayoutManager gridLayoutManager =
+        gridLayoutManager =
                 new GridLayoutManager(this, 2);
 
         mRecyclerView.setLayoutManager(gridLayoutManager);
@@ -82,6 +88,29 @@ public class MainActivity extends AppCompatActivity
         //Load the movie data, default sorted by popularity
         sortOrder = getSharedPreferenceOrder();
         loadMovieData(sortOrder);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        mListState = gridLayoutManager.onSaveInstanceState();
+        outState.putParcelable(LIST_STATE_KEY, mListState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle outState) {
+        if(outState != null)
+            mListState = outState.getParcelable(LIST_STATE_KEY);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mListState != null) {
+            gridLayoutManager.onRestoreInstanceState(mListState);
+        }
     }
 
     //Method to kick off the Background task
@@ -125,7 +154,7 @@ public class MainActivity extends AppCompatActivity
         viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                Log.v("LOG", "Updating List from LiveData in ViewModel");
+                Log.v(TAG, "Updating List from LiveData in ViewModel");
                 progressBar.setVisibility(View.INVISIBLE);
                 if(movies.isEmpty()){
                     showErrorMessage();
