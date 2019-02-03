@@ -1,6 +1,7 @@
 package com.example.android.moviesapp;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -29,11 +30,18 @@ import android.widget.TextView;
 import com.example.android.moviesapp.Adapter.MovieAdapter;
 import com.example.android.moviesapp.database.AppDatabase;
 import com.example.android.moviesapp.model.Movie;
+import com.example.android.moviesapp.model.MoviesList;
+import com.example.android.moviesapp.utilities.GetDataService;
 import com.example.android.moviesapp.utilities.NetworkUtils;
 import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
+import com.example.android.moviesapp.utilities.RetrofitClientInstance;
 
 import java.net.URL;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
@@ -145,6 +153,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private List<Movie> moviesList;
+
     private void loadDataFromInternet(String sortOrder){
         //Check if there is an internet connection
         connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(CONNECTIVITY_SERVICE);
@@ -152,18 +162,28 @@ public class MainActivity extends AppCompatActivity
 
         //Load Movie Data if device is connected to internet, else show error message
         if(activeNetwork != null && activeNetwork.isConnected()){
-            showMovieData();
-            //Make a Bundle for parameters
-            Bundle bundle = new Bundle();
-            bundle.putString(PREFERRED_SORT_ORDER, sortOrder);
-            //Kick off the loader
-            LoaderManager loaderManager = getSupportLoaderManager();
-            Loader<Object> movieLoader = loaderManager.getLoader(MOVIE_LOADER);
-            if(movieLoader == null){
-                loaderManager.initLoader(MOVIE_LOADER, bundle, this).forceLoad();
-            }else {
-                loaderManager.restartLoader(MOVIE_LOADER, bundle,this).forceLoad();
-            }
+            GetDataService api = RetrofitClientInstance.getApiService();
+
+            Call<MoviesList> call = api.getAllMovies(sortOrder);
+
+            call.enqueue(new Callback<MoviesList>() {
+                @Override
+                public void onResponse(Call<MoviesList> call, Response<MoviesList> response) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    if(response.isSuccessful()){
+                        moviesList = response.body().getMovies();
+                        movieAdapter.setMoviesArray(moviesList);
+                    } else {
+                        showErrorMessage();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MoviesList> call, Throwable t) {
+                    showErrorMessage();
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
+            });
 
         }else {
             showErrorMessage();
