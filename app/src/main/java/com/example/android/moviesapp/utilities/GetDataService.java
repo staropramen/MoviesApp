@@ -22,9 +22,9 @@ public interface GetDataService {
     @GET("{path}?api_key=" + BuildConfig.API_KEY)
     Call<MoviesList> getAllMovies(@Path("path") String path);
 
-    @GET("{movieId}/reviews?api_key=" + BuildConfig.API_KEY)
+    @GET("{movieId}/videos?api_key=" + BuildConfig.API_KEY)
     Call<TrailersList> getAllTrailers(@Path("movieId") String movieId);
 
-    @GET("{movieId}/videos?api_key=" + BuildConfig.API_KEY)
+    @GET("{movieId}/reviews?api_key=" + BuildConfig.API_KEY)
     Call<ReviewsList> getAllReviews(@Path("movieId") String movieId);
 }

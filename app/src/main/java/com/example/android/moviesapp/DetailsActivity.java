@@ -44,7 +44,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DetailsActivity extends AppCompatActivity
-        implements VideoAdapter.VideoOnClickHandler, LoaderManager.LoaderCallbacks<Detail> {
+        implements VideoAdapter.VideoOnClickHandler{
 
     ActivityDetailsBinding mBinding;
 
@@ -57,11 +57,9 @@ public class DetailsActivity extends AppCompatActivity
     private String MOVIE_QUERY_ID = "movie-query-id";
     private String PATH_TRAILER = "videos";
     private String PATH_REVIEWS= "reviews";
-    private static final int DETAIL_LOADER = 45;
     private String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
     private String YOUTUBE_APP_BASE = "vnd.youtube:";
     private String MOVIE_EXTRA = "movie";
-    private String IS_FAV_EXTRA = "is-fav";
 
     private String baseImageUrl = "https://image.tmdb.org/t/p/w185";
 
@@ -116,7 +114,7 @@ public class DetailsActivity extends AppCompatActivity
         mBinding.reviewRecyclerView.setAdapter(reviewAdapter);
 
         String movieId = movie.getMovieId();
-        //loadMovieReviews(movieId);
+        loadMovieReviews(movieId);
         loadMovieTrailers(movieId);
 
         //Set OnClick for Favorites Button
@@ -192,12 +190,6 @@ public class DetailsActivity extends AppCompatActivity
             public void onResponse(Call<TrailersList> call, Response<TrailersList> response) {
                 if(response.isSuccessful()){
                     movieTrailers = response.body().getTrailers();
-                    if(movieTrailers.get(0).getName() == null){
-                        Log.d("MODEL", "Null");
-                    }else {
-                        Log.d("MODEL", "Not Null");
-                    }
-
                     videoAdapter.setMovieTrailerArray(movieTrailers);
                 }
             }
@@ -209,7 +201,7 @@ public class DetailsActivity extends AppCompatActivity
     }
 
     //Kick off the Background Task for Reviews
-    /*private void loadMovieReviews(String movieId){
+    private void loadMovieReviews(String movieId){
         GetDataService api = RetrofitClientInstance.getApiService();
         Call<ReviewsList> call = api.getAllReviews(movieId);
 
@@ -227,7 +219,7 @@ public class DetailsActivity extends AppCompatActivity
             public void onFailure(Call<ReviewsList> call, Throwable t) {
             }
         });
-    }*/
+    }
 
     @Override
     public void onClick(MovieTrailer movieTrailer) {
@@ -240,64 +232,5 @@ public class DetailsActivity extends AppCompatActivity
         } catch (ActivityNotFoundException ex) {
             startActivity(webIntent);
         }
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    @NonNull
-    @Override
-    public Loader<Detail> onCreateLoader(int i, @Nullable final Bundle bundle) {
-        return new AsyncTaskLoader<Detail>(this) {
-            @Override
-            protected void onStartLoading() {
-                super.onStartLoading();
-                if(bundle == null){
-                    return;
-                }
-                //Hide recyclerview while loading
-                mBinding.trailerRecyclerView.setVisibility(View.INVISIBLE);
-            }
-
-            @Nullable
-            @Override
-            public Detail loadInBackground() {
-                String movieId = bundle.getString(MOVIE_QUERY_ID);
-                //Return null if param is empty
-                if(movieId == null || TextUtils.isEmpty(movieId)){
-                    return null;
-                }
-                URL trailerRequestUrl = NetworkUtils.builtDetailsUrl(PATH_TRAILER, movieId);
-                URL reviewRequestUrl = NetworkUtils.builtDetailsUrl(PATH_REVIEWS, movieId);
-
-
-
-                try {
-                    String jsonResponse = NetworkUtils.getHttpResponse(trailerRequestUrl);
-                    ArrayList<MovieTrailer> movieTrailers = OpenMovieJsonUtils.getTrailerStingsFromJson(DetailsActivity.this, jsonResponse);
-                    String jsonReviewResponse = NetworkUtils.getHttpResponse(reviewRequestUrl);
-                    ArrayList<MovieReview> movieReviews = OpenMovieJsonUtils.getReviewStingsFromJson(DetailsActivity.this, jsonReviewResponse);
-                    Detail detail = new Detail(movieTrailers, movieReviews);
-                    return detail;
-                }catch (Exception e){
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Detail> loader, Detail detail) {
-        if(detail != null){
-            mBinding.trailerRecyclerView.setVisibility(View.VISIBLE);
-            ArrayList<MovieTrailer> movieTrailers = detail.getMovieTrailers();
-            ArrayList<MovieReview> movieReviews = detail.getMovieReviews();
-            videoAdapter.setMovieTrailerArray(movieTrailers);
-            reviewAdapter.setMovieReviewArray(movieReviews);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<Detail> loader) {
-
     }
 }

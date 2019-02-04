@@ -46,7 +46,7 @@ import retrofit2.Response;
 import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 public class MainActivity extends AppCompatActivity
-        implements MovieAdapter.MovieOnClickHandler, LoaderManager.LoaderCallbacks<List<Movie>> {
+        implements MovieAdapter.MovieOnClickHandler{
 
     private String TAG = MainActivity.class.getSimpleName();
     private MovieAdapter movieAdapter;
@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity
     private String SORT_STATE_KEY = "state-sort-order";
 
     private static final String PREFERRED_SORT_ORDER = "preferred_sort_order";
-
-    private static final int MOVIE_LOADER = 22;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,56 +225,6 @@ public class MainActivity extends AppCompatActivity
         errorTextView.setVisibility(View.VISIBLE);
         //Default set text to error
         errorTextView.setText(R.string.error_message);
-    }
-
-    //Loader
-    @SuppressLint("StaticFieldLeak")
-    @NonNull
-    @Override
-    public Loader<List<Movie>> onCreateLoader(int i, @Nullable final Bundle bundle) {
-        return new AsyncTaskLoader<List<Movie>>(this) {
-            @Override
-            protected void onStartLoading() {
-                super.onStartLoading();
-                if(bundle == null){
-                    return;
-                }
-                progressBar.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public List<Movie> loadInBackground() {
-                String preferredOrder = bundle.getString(PREFERRED_SORT_ORDER);
-                //Return null if param is empty
-                if(preferredOrder == null || TextUtils.isEmpty(preferredOrder)){
-                    return null;
-                }
-                URL moviesRequestUrl = NetworkUtils.builtUrl(preferredOrder);
-
-                try {
-                    String jsonResponse = NetworkUtils.getHttpResponse(moviesRequestUrl);
-                    return OpenMovieJsonUtils.getStringsFromJson(MainActivity.this, jsonResponse);
-                }catch (Exception e){
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<List<Movie>> loader, List<Movie> movies) {
-        progressBar.setVisibility(View.INVISIBLE);
-        if(movies != null){
-            showMovieData();
-            movieAdapter.setMoviesArray(movies);
-        }else {
-            showErrorMessage();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<List<Movie>> loader) {
     }
 
     @Override
