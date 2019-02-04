@@ -10,6 +10,12 @@ public class MovieReview {
     @SerializedName("url")
     private String reviewUrl;
 
+    public MovieReview(String author, String content, String reviewUrl){
+        this.content = content;
+        this.author = author;
+        this.reviewUrl = reviewUrl;
+    }
+
     public String getAuthor() {
         return author;
     }

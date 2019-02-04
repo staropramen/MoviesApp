@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity
     private Parcelable mListState;
     private int selectedMenuItem;
     private MenuItem menuItem;
+    private List<Movie> moviesList;
 
     private GridLayoutManager gridLayoutManager;
 
@@ -152,8 +153,6 @@ public class MainActivity extends AppCompatActivity
             loadDataFromInternet(sortOrder);
         }
     }
-
-    private List<Movie> moviesList;
 
     private void loadDataFromInternet(String sortOrder){
         //Check if there is an internet connection

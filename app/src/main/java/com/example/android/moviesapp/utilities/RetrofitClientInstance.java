@@ -1,5 +1,8 @@
 package com.example.android.moviesapp.utilities;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -13,6 +16,7 @@ public class RetrofitClientInstance {
      * Get Retrofit Instance
      */
     private static Retrofit getRetrofitInstance() {
+
         return new Retrofit.Builder()
                 .baseUrl(MOVIE_DATABASE_URL_POPULAR)
                 .addConverterFactory(GsonConverterFactory.create())

@@ -11,11 +11,11 @@ import android.widget.TextView;
 import com.example.android.moviesapp.R;
 import com.example.android.moviesapp.model.MovieTrailer;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoAdapterViewHolder> {
 
-    private ArrayList<MovieTrailer> movieTrailers;
+    private List<MovieTrailer> movieTrailers;
 
     private final  VideoOnClickHandler videoOnClickHandler;
 
@@ -72,7 +72,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoAdapter
     }
 
     //Function to set movieTrailers
-    public void setMovieTrailerArray(ArrayList<MovieTrailer> trailerArrayToSet){
+    public void setMovieTrailerArray(List<MovieTrailer> trailerArrayToSet){
         movieTrailers = trailerArrayToSet;
         notifyDataSetChanged();
     }

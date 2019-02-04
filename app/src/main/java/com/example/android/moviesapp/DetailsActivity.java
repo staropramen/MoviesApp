@@ -26,13 +26,22 @@ import com.example.android.moviesapp.model.Detail;
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.model.MovieReview;
 import com.example.android.moviesapp.model.MovieTrailer;
+import com.example.android.moviesapp.model.ReviewsList;
+import com.example.android.moviesapp.model.TrailersList;
+import com.example.android.moviesapp.utilities.GetDataService;
 import com.example.android.moviesapp.utilities.MovieDateUtils;
 import com.example.android.moviesapp.utilities.NetworkUtils;
 import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
+import com.example.android.moviesapp.utilities.RetrofitClientInstance;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailsActivity extends AppCompatActivity
         implements VideoAdapter.VideoOnClickHandler, LoaderManager.LoaderCallbacks<Detail> {
@@ -42,6 +51,8 @@ public class DetailsActivity extends AppCompatActivity
     private Movie movie;
     private VideoAdapter videoAdapter;
     private ReviewAdapter reviewAdapter;
+    private List<MovieTrailer> movieTrailers;
+    private List<MovieReview> movieReviews;
 
     private String MOVIE_QUERY_ID = "movie-query-id";
     private String PATH_TRAILER = "videos";
@@ -105,7 +116,8 @@ public class DetailsActivity extends AppCompatActivity
         mBinding.reviewRecyclerView.setAdapter(reviewAdapter);
 
         String movieId = movie.getMovieId();
-        loadMovieDetails(movieId);
+        //loadMovieReviews(movieId);
+        loadMovieTrailers(movieId);
 
         //Set OnClick for Favorites Button
         mBinding.ivFavorite.setOnClickListener(new View.OnClickListener() {
@@ -170,20 +182,52 @@ public class DetailsActivity extends AppCompatActivity
         });
     }
 
-    //Kick off the Background Task
-    private void loadMovieDetails(String movieId){
-        //Make a Bundle for parameters
-        Bundle bundle = new Bundle();
-        bundle.putString(MOVIE_QUERY_ID, movieId);
-        //Kick off the loader
-        LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<Object> detailsLoader = loaderManager.getLoader(DETAIL_LOADER);
-        if(detailsLoader == null){
-            loaderManager.initLoader(DETAIL_LOADER, bundle, this).forceLoad();
-        }else {
-            loaderManager.restartLoader(DETAIL_LOADER, bundle,this).forceLoad();
-        }
+    //Kick off the Background Task for Trailers
+    private void loadMovieTrailers(String movieId){
+        GetDataService api = RetrofitClientInstance.getApiService();
+        Call<TrailersList> call = api.getAllTrailers(movieId);
+
+        call.enqueue(new Callback<TrailersList>() {
+            @Override
+            public void onResponse(Call<TrailersList> call, Response<TrailersList> response) {
+                if(response.isSuccessful()){
+                    movieTrailers = response.body().getTrailers();
+                    if(movieTrailers.get(0).getName() == null){
+                        Log.d("MODEL", "Null");
+                    }else {
+                        Log.d("MODEL", "Not Null");
+                    }
+
+                    videoAdapter.setMovieTrailerArray(movieTrailers);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TrailersList> call, Throwable t) {
+            }
+        });
     }
+
+    //Kick off the Background Task for Reviews
+    /*private void loadMovieReviews(String movieId){
+        GetDataService api = RetrofitClientInstance.getApiService();
+        Call<ReviewsList> call = api.getAllReviews(movieId);
+
+        call.enqueue(new Callback<ReviewsList>() {
+            @Override
+            public void onResponse(Call<ReviewsList> call, Response<ReviewsList> response) {
+                if(response.isSuccessful()){
+                    movieReviews = response.body().getReviews();
+                    Log.d("ARRAY", movieReviews.toString());
+                    reviewAdapter.setMovieReviewArray(movieReviews);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReviewsList> call, Throwable t) {
+            }
+        });
+    }*/
 
     @Override
     public void onClick(MovieTrailer movieTrailer) {

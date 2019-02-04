@@ -15,11 +15,12 @@ import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.model.MovieReview;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
+
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder> {
 
-    private ArrayList<MovieReview> movieReviews;
+    private List<MovieReview> movieReviews;
 
 
 
@@ -63,7 +64,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
     }
 
     //Function to set movieTrailers
-    public void setMovieReviewArray(ArrayList<MovieReview> reviewArrayToSet){
+    public void setMovieReviewArray(List<MovieReview> reviewArrayToSet){
         movieReviews = reviewArrayToSet;
         notifyDataSetChanged();
     }

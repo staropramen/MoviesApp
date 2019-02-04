@@ -6,11 +6,20 @@ import com.google.gson.annotations.SerializedName;
 public class MovieTrailer {
 
     @SerializedName("key")
+    @Expose
     private String key;
     @SerializedName("name")
+    @Expose
     private String name;
     @SerializedName("type")
+    @Expose
     private String type;
+
+    public MovieTrailer(String key, String name, String type){
+        this.key = key;
+        this.name = name;
+        this.type = type;
+    }
 
     public String getKey() {
         return key;
