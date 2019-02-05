@@ -1,20 +1,13 @@
 package com.example.android.moviesapp;
 
-import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -22,7 +15,6 @@ import com.example.android.moviesapp.Adapter.ReviewAdapter;
 import com.example.android.moviesapp.Adapter.VideoAdapter;
 import com.example.android.moviesapp.database.AppDatabase;
 import com.example.android.moviesapp.databinding.ActivityDetailsBinding;
-import com.example.android.moviesapp.model.Detail;
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.model.MovieReview;
 import com.example.android.moviesapp.model.MovieTrailer;
@@ -30,13 +22,9 @@ import com.example.android.moviesapp.model.ReviewsList;
 import com.example.android.moviesapp.model.TrailersList;
 import com.example.android.moviesapp.utilities.GetDataService;
 import com.example.android.moviesapp.utilities.MovieDateUtils;
-import com.example.android.moviesapp.utilities.NetworkUtils;
-import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 import com.example.android.moviesapp.utilities.RetrofitClientInstance;
 import com.squareup.picasso.Picasso;
 
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;

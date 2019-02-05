@@ -1,5 +1,7 @@
 package com.example.android.moviesapp.utilities;
 
+import android.arch.lifecycle.LiveData;
+
 import com.example.android.moviesapp.BuildConfig;
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.model.MovieTrailer;

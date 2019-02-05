@@ -1,7 +1,5 @@
 package com.example.android.moviesapp;
 
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -9,16 +7,11 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,18 +25,13 @@ import com.example.android.moviesapp.database.AppDatabase;
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.model.MoviesList;
 import com.example.android.moviesapp.utilities.GetDataService;
-import com.example.android.moviesapp.utilities.NetworkUtils;
-import com.example.android.moviesapp.utilities.OpenMovieJsonUtils;
 import com.example.android.moviesapp.utilities.RetrofitClientInstance;
 
-import java.net.URL;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.MovieOnClickHandler{
@@ -100,6 +88,7 @@ public class MainActivity extends AppCompatActivity
 
         //Load the movie data, default sorted by popularity
         sortOrder = getSortOrder();
+        Log.d(TAG, sortOrder);
         loadMovieData(sortOrder);
     }
 
@@ -117,6 +106,7 @@ public class MainActivity extends AppCompatActivity
     protected void onRestoreInstanceState(Bundle outState) {
         if(outState != null)
             selectedMenuItem = outState.getInt(SORT_STATE_KEY);
+            Log.d(TAG, "RESTORE INSTANCE STATE" + selectedMenuItem);
             mListState = outState.getParcelable(LIST_STATE_KEY);
     }
 
@@ -148,7 +138,7 @@ public class MainActivity extends AppCompatActivity
         if(sortOrder.equals(getString(R.string.favorites))){
             setupMainViewModel();
         } else {
-            loadDataFromInternet(sortOrder);
+            setupPopularViewModel();
         }
     }
 
@@ -188,8 +178,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setupPopularViewModel(){
+        PopularViewModel popularViewModel =ViewModelProviders.of(this).get(PopularViewModel.class);
+        popularViewModel.getMovies().observe(this, new Observer<MoviesList>(){
+
+            @Override
+            public void onChanged(@Nullable MoviesList moviesList) {
+                List<Movie> movies = moviesList.getMovies();
+                movieAdapter.setMoviesArray(movies);
+            }
+        });
+    }
+
     private void setupMainViewModel(){
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        FavoritesViewModel viewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
         viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
@@ -257,8 +259,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        int id = item.getItemId();
+        switch (id){
             case R.id.sort_popular:
+                selectedMenuItem = id;
                 if(item.isChecked()){
                     return false;
                 }else {
@@ -268,6 +272,7 @@ public class MainActivity extends AppCompatActivity
                     return true;
                 }
             case R.id.sort_top_rated:
+                selectedMenuItem = id;
                 if(item.isChecked()){
                     return false;
                 }else {
@@ -277,6 +282,7 @@ public class MainActivity extends AppCompatActivity
                     return true;
                 }
             case R.id.sort_favorites:
+                selectedMenuItem = id;
                 if(item.isChecked()){
                     return false;
                 }else {

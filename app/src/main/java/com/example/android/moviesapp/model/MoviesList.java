@@ -1,5 +1,8 @@
 package com.example.android.moviesapp.model;
 
+import android.arch.lifecycle.LiveData;
+
+import com.example.android.moviesapp.PopularViewModel;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

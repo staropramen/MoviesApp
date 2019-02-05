@@ -11,13 +11,13 @@ import com.example.android.moviesapp.model.Movie;
 
 import java.util.List;
 
-public class MainViewModel extends AndroidViewModel {
+public class FavoritesViewModel extends AndroidViewModel {
 
-    private static final String TAG = MainViewModel.class.getSimpleName();
+    private static final String TAG = FavoritesViewModel.class.getSimpleName();
 
     private LiveData<List<Movie>> movies;
 
-    public MainViewModel(@NonNull Application application) {
+    public FavoritesViewModel(@NonNull Application application) {
         super(application);
         AppDatabase database = AppDatabase.getInstance(this.getApplication());
         Log.d(TAG, "Load movies from database");
