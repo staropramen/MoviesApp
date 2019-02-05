@@ -1,9 +1,5 @@
 package com.example.android.moviesapp.utilities;
 
-import android.content.res.Resources;
-
-import com.example.android.moviesapp.R;
-
 public final class MovieDateUtils {
     private static String[] shortMonthArray = {
             "Placeholder",

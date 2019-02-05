@@ -1,8 +1,5 @@
 package com.example.android.moviesapp.utilities;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -12,9 +9,6 @@ public class RetrofitClientInstance {
     private static final String MOVIE_DATABASE_URL_POPULAR =
             "http://api.themoviedb.org/3/movie/";
 
-    /**
-     * Get Retrofit Instance
-     */
     private static Retrofit getRetrofitInstance() {
 
         return new Retrofit.Builder()
@@ -23,11 +17,6 @@ public class RetrofitClientInstance {
                 .build();
     }
 
-    /**
-     * Get API Service
-     *
-     * @return API Service
-     */
     public static GetDataService getApiService() {
         return getRetrofitInstance().create(GetDataService.class);
     }

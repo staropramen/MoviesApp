@@ -24,14 +24,11 @@ import com.example.android.moviesapp.Adapter.MovieAdapter;
 import com.example.android.moviesapp.database.AppDatabase;
 import com.example.android.moviesapp.model.Movie;
 import com.example.android.moviesapp.model.MoviesList;
-import com.example.android.moviesapp.utilities.GetDataService;
-import com.example.android.moviesapp.utilities.RetrofitClientInstance;
+import com.example.android.moviesapp.viewmodel.FavoritesViewModel;
+import com.example.android.moviesapp.viewmodel.PopularViewModel;
+import com.example.android.moviesapp.viewmodel.TopRatedViewModel;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.MovieOnClickHandler{
@@ -45,7 +42,6 @@ public class MainActivity extends AppCompatActivity
     private Parcelable mListState;
     private int selectedMenuItem;
     private MenuItem menuItem;
-    private List<Movie> moviesList;
 
     private GridLayoutManager gridLayoutManager;
 
@@ -56,8 +52,6 @@ public class MainActivity extends AppCompatActivity
     private String MOVIE_EXTRA = "movie";
     private String LIST_STATE_KEY = "list-state";
     private String SORT_STATE_KEY = "state-sort-order";
-
-    private static final String PREFERRED_SORT_ORDER = "preferred_sort_order";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +79,8 @@ public class MainActivity extends AppCompatActivity
             selectedMenuItem = savedInstanceState.getInt(SORT_STATE_KEY);
         }
 
-
         //Load the movie data, default sorted by popularity
-        sortOrder = getSortOrder();
+        sortOrder = getSortOrder(selectedMenuItem);
         Log.d(TAG, sortOrder);
         loadMovieData(sortOrder);
     }
@@ -121,7 +114,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     //Get sortOrder
-    private String getSortOrder(){
+    private String getSortOrder(int selectedMenuItem){
         String sortOrder;
         if(selectedMenuItem == R.id.sort_top_rated){
             sortOrder = getString(R.string.top_rated);
@@ -135,6 +128,7 @@ public class MainActivity extends AppCompatActivity
 
     //Method to kick off the Background task
     private void loadMovieData(String sortOrder){
+        progressBar.setVisibility(View.VISIBLE);
         if(sortOrder.equals(getString(R.string.favorites))){
             setupFavoritesViewModel();
         } else {
@@ -167,6 +161,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChanged(@Nullable MoviesList moviesList) {
+                progressBar.setVisibility(View.INVISIBLE);
                 List<Movie> movies = moviesList.getMovies();
                 movieAdapter.setMoviesArray(movies);
             }
@@ -179,6 +174,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChanged(@Nullable MoviesList moviesList) {
+                progressBar.setVisibility(View.INVISIBLE);
                 List<Movie> movies = moviesList.getMovies();
                 movieAdapter.setMoviesArray(movies);
             }
@@ -292,7 +288,5 @@ public class MainActivity extends AppCompatActivity
                 default:
                     return super.onOptionsItemSelected(item);
         }
-
-
     }
 }

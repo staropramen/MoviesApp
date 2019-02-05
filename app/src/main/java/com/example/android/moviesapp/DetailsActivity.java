@@ -1,14 +1,16 @@
 package com.example.android.moviesapp;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.View;
 
 import com.example.android.moviesapp.Adapter.ReviewAdapter;
@@ -20,16 +22,12 @@ import com.example.android.moviesapp.model.MovieReview;
 import com.example.android.moviesapp.model.MovieTrailer;
 import com.example.android.moviesapp.model.ReviewsList;
 import com.example.android.moviesapp.model.TrailersList;
-import com.example.android.moviesapp.utilities.GetDataService;
 import com.example.android.moviesapp.utilities.MovieDateUtils;
-import com.example.android.moviesapp.utilities.RetrofitClientInstance;
+import com.example.android.moviesapp.viewmodel.ReviewsViewModel;
+import com.example.android.moviesapp.viewmodel.TrailersViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class DetailsActivity extends AppCompatActivity
         implements VideoAdapter.VideoOnClickHandler{
@@ -39,12 +37,6 @@ public class DetailsActivity extends AppCompatActivity
     private Movie movie;
     private VideoAdapter videoAdapter;
     private ReviewAdapter reviewAdapter;
-    private List<MovieTrailer> movieTrailers;
-    private List<MovieReview> movieReviews;
-
-    private String MOVIE_QUERY_ID = "movie-query-id";
-    private String PATH_TRAILER = "videos";
-    private String PATH_REVIEWS= "reviews";
     private String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
     private String YOUTUBE_APP_BASE = "vnd.youtube:";
     private String MOVIE_EXTRA = "movie";
@@ -102,8 +94,8 @@ public class DetailsActivity extends AppCompatActivity
         mBinding.reviewRecyclerView.setAdapter(reviewAdapter);
 
         String movieId = movie.getMovieId();
-        loadMovieReviews(movieId);
-        loadMovieTrailers(movieId);
+        setupReviewsViewModel(movieId);
+        setupTrailersViewModel(movieId);
 
         //Set OnClick for Favorites Button
         mBinding.ivFavorite.setOnClickListener(new View.OnClickListener() {
@@ -168,43 +160,24 @@ public class DetailsActivity extends AppCompatActivity
         });
     }
 
-    //Kick off the Background Task for Trailers
-    private void loadMovieTrailers(String movieId){
-        GetDataService api = RetrofitClientInstance.getApiService();
-        Call<TrailersList> call = api.getAllTrailers(movieId);
-
-        call.enqueue(new Callback<TrailersList>() {
+    private void setupTrailersViewModel(String movieId){
+        TrailersViewModel trailersViewModel = ViewModelProviders.of(this).get(TrailersViewModel.class);
+        trailersViewModel.getTrailers(movieId).observe(this, new Observer<TrailersList>() {
             @Override
-            public void onResponse(Call<TrailersList> call, Response<TrailersList> response) {
-                if(response.isSuccessful()){
-                    movieTrailers = response.body().getTrailers();
-                    videoAdapter.setMovieTrailerArray(movieTrailers);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<TrailersList> call, Throwable t) {
+            public void onChanged(@Nullable TrailersList trailersList) {
+                List<MovieTrailer> movieTrailers = trailersList.getTrailers();
+                videoAdapter.setMovieTrailerArray(movieTrailers);
             }
         });
     }
 
-    //Kick off the Background Task for Reviews
-    private void loadMovieReviews(String movieId){
-        GetDataService api = RetrofitClientInstance.getApiService();
-        Call<ReviewsList> call = api.getAllReviews(movieId);
-
-        call.enqueue(new Callback<ReviewsList>() {
+    private void setupReviewsViewModel(String movieId){
+        ReviewsViewModel reviewsViewModel = ViewModelProviders.of(this).get(ReviewsViewModel.class);
+        reviewsViewModel.getReviews(movieId).observe(this, new Observer<ReviewsList>() {
             @Override
-            public void onResponse(Call<ReviewsList> call, Response<ReviewsList> response) {
-                if(response.isSuccessful()){
-                    movieReviews = response.body().getReviews();
-                    Log.d("ARRAY", movieReviews.toString());
-                    reviewAdapter.setMovieReviewArray(movieReviews);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ReviewsList> call, Throwable t) {
+            public void onChanged(@Nullable ReviewsList reviewsList) {
+                List<MovieReview> movieReviews = reviewsList.getReviews();
+                reviewAdapter.setMovieReviewArray(movieReviews);
             }
         });
     }

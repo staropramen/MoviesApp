@@ -34,7 +34,6 @@ public class Movie implements Parcelable {
     @SerializedName("overview")
     private String plotSynopsis;
 
-
     //Constructor
     @Ignore
     public Movie(String movieId, String originalTitle, String releaseDate, String posterPath, String voteAverage,
@@ -70,7 +69,6 @@ public class Movie implements Parcelable {
     }
 
     //Get Methods
-
     public int getPrimaryKey() {return primaryKey; }
     public String getMovieId(){return movieId;}
     public String getOriginalTitle(){ return originalTitle; }
@@ -88,7 +86,6 @@ public class Movie implements Parcelable {
     }
 
     //Set Methods
-
     public void setPrimaryKey(int primaryKey) {this.primaryKey = primaryKey; }
     public void setMovieId(String movieId){
         this.movieId = movieId;

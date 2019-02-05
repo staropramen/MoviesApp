@@ -1,4 +1,4 @@
-package com.example.android.moviesapp;
+package com.example.android.moviesapp.viewmodel;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -13,12 +13,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TopRatedViewModel extends ViewModel {
-    private static final String TAG = TopRatedViewModel.class.getSimpleName();
-    private String SORT_ORDER = "top_rated";
+public class PopularViewModel extends ViewModel {
+    private static final String TAG = PopularViewModel.class.getSimpleName();
+    private String SORT_ORDER = "popular";
 
     private MutableLiveData<MoviesList> moviesList;
-
 
     public LiveData<MoviesList> getMovies(){
         if(moviesList == null){

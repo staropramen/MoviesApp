@@ -3,19 +3,11 @@ package com.example.android.moviesapp.utilities;
 import android.arch.lifecycle.LiveData;
 
 import com.example.android.moviesapp.BuildConfig;
-import com.example.android.moviesapp.model.Movie;
-import com.example.android.moviesapp.model.MovieTrailer;
 import com.example.android.moviesapp.model.MoviesList;
 import com.example.android.moviesapp.model.ReviewsList;
 import com.example.android.moviesapp.model.TrailersList;
 
-import org.json.JSONArray;
-
-import java.util.List;
-
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 

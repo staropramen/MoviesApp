@@ -44,5 +44,4 @@ public class MovieTrailer {
     public void setType(String type) {
         this.type = type;
     }
-
 }
