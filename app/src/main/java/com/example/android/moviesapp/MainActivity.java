@@ -136,9 +136,9 @@ public class MainActivity extends AppCompatActivity
     //Method to kick off the Background task
     private void loadMovieData(String sortOrder){
         if(sortOrder.equals(getString(R.string.favorites))){
-            setupMainViewModel();
+            setupFavoritesViewModel();
         } else {
-            setupPopularViewModel();
+            loadDataFromInternet(sortOrder);
         }
     }
 
@@ -149,28 +149,11 @@ public class MainActivity extends AppCompatActivity
 
         //Load Movie Data if device is connected to internet, else show error message
         if(activeNetwork != null && activeNetwork.isConnected()){
-            GetDataService api = RetrofitClientInstance.getApiService();
-
-            Call<MoviesList> call = api.getAllMovies(sortOrder);
-
-            call.enqueue(new Callback<MoviesList>() {
-                @Override
-                public void onResponse(Call<MoviesList> call, Response<MoviesList> response) {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    if(response.isSuccessful()){
-                        moviesList = response.body().getMovies();
-                        movieAdapter.setMoviesArray(moviesList);
-                    } else {
-                        showErrorMessage();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<MoviesList> call, Throwable t) {
-                    showErrorMessage();
-                    progressBar.setVisibility(View.INVISIBLE);
-                }
-            });
+            if(sortOrder == getString(R.string.top_rated)){
+                setupTopRatedViewModel();
+            }else {
+                setupPopularViewModel();
+            }
 
         }else {
             showErrorMessage();
@@ -190,7 +173,19 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void setupMainViewModel(){
+    private void setupTopRatedViewModel(){
+        TopRatedViewModel topRatedViewModel =ViewModelProviders.of(this).get(TopRatedViewModel.class);
+        topRatedViewModel.getMovies().observe(this, new Observer<MoviesList>(){
+
+            @Override
+            public void onChanged(@Nullable MoviesList moviesList) {
+                List<Movie> movies = moviesList.getMovies();
+                movieAdapter.setMoviesArray(movies);
+            }
+        });
+    }
+
+    private void setupFavoritesViewModel(){
         FavoritesViewModel viewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
         viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
             @Override
